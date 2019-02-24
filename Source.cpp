@@ -20,6 +20,27 @@ struct productos{
 	lote *aba;
 };
 
+struct factura{
+	int numfactura;
+	int cantvendido;
+	int dia;
+	int mes;
+	int anno;
+	int ci;
+	long int total;
+	char desc[20];
+	int numlote;
+	int precio;
+};
+
+struct cliente{
+	int ci;
+	char nomapellido[20];
+	char direc[15];
+	int numerotlf[12];
+	cliente *sig;
+	factura *aba;
+};
 
 void insertarProductos(productos**p,char desc[20],char ramo[10],int cod){
 		productos *t= new productos;
@@ -86,123 +107,184 @@ void Ventas(productos*p){
 
 } */
 
-void menuClientes(){
-	int op=-1;
-	system("cls");
-	while (op){
-		printf("\t\tMENU CLIENTES. \n\n ");
-		printf("\t1.Agregar cliente. \n ");
-		printf("\t2.Consultar cliente. \n ");
-		printf("\t3.Eliminar cliente. \n\n ");
-		printf("0. Salir al menu principal.\n\n");
-
-		scanf("%i",&op);
-		
-		switch(op){
-			case 1:
-					break;
-			case 2:
-					break;
-			case 3:
-					break;
-		}
-		
-		system("pause");
-		system("cls");
+void consultapornombre(productos *p, char produc1[]){
+	productos *auxp=p;
+	int igual=0;
+	while (auxp){
+       for (int i=0; i<20; i++) {
+          if(produc1[i]!=auxp->desc[i])
+            igual=-1;
+	   }
+    if(igual==0){
+		printf("\t"); printf("El codigo del producto ");
+		for (int c=0;produc1[c]!='\0';c++)
+			printf(" %s",produc1[c]);
+		printf("es %i",auxp->codigo,"\n\n");
+	    break;
+	}
+	auxp=auxp->sig;
+	if (!auxp && igual!=0){
+		printf("\t"); printf("El codigo del producto ");
+		for (int c=0;produc1[c]!='\0';c++)
+			printf(" %s",produc1[c]);
+		printf(" no existe, \n");
+	    printf("\t"); printf(" El producto ");
+		for (int c=0;produc1[c]!='\0';c++)
+			printf(" %s",produc1[c]);
+		printf("no esta registrado \n\n");
+	}
 	}
 }
 
+void menuClientes(){
+    int op=-1;
+    system("cls");
+    while (op){
+        printf("\t\tMENU CLIENTES. \n\n ");
+        printf("\t1.Agregar cliente. \n ");
+        printf("\t2.Consultar cliente. \n ");
+        printf("\t3.Eliminar cliente. \n\n ");
+        printf("\t0. Salir al menu principal.\n\n");
+ 
+        printf("\t"); scanf("%i",&op);
+       
+        switch(op){
+            case 1:
+                    break;
+            case 2:
+                    break;
+            case 3:
+                    break;
+        }
+       
+        system("pause");
+        system("cls");
+    }
+}
+
+void menuVentas(){
+    int op=-1;
+    system("cls");
+    while (op){
+        printf("\t\tMENU VENTAS. \n\n ");
+        printf("\t1.Agregar/Hacer una venta. \n ");
+        printf("\t2.Consultar venta. \n ");
+        printf("\t3.Eliminar venta. \n\n ");
+        printf("\t0. Salir al menu principal.\n\n");
+ 
+        printf("\t"); scanf("%i",&op);
+       
+        switch(op){
+            case 1:
+                    break;
+            case 2:
+                    break;
+            case 3:
+                    break;
+        }
+       
+        system("pause");
+        system("cls");
+    }
+}
 
 void menuConsultas(){
-	int op=-1;
-	system("cls");
-	while(op){
-		printf("\t\tMENU CONSULTAS. \n\n ");
-		printf("\t1.Consultar el codigo de un producto. \n ");
-		printf("\t2.Consultar la exitencia de un producto. \n ");
-		printf("\t3.Consultar las ventas de un producto entre dos fechas. \n ");
-		printf("\t4.Consultar las ventas de un producto para un cliente. \n\n ");
-		printf("0. Salir.\n\n");
-
-		scanf("%i",&op);
-
-		switch(op){
-			case 1:
-					break;
-			case 2:
-					break;
-			case 3:
-					break;
-		}
-		
-		system("pause");
-		system("cls");
-
-	}
+    int op=-1,cod;
+    char nom[20];
+    productos *p=NULL;
+    system("cls");
+    while(op){
+        printf("\t\tMENU CONSULTAS. \n\n ");
+        printf("\t1.Consultar el codigo de un producto. \n ");
+        printf("\t2.Consultar la exitencia de un producto. \n ");
+        printf("\t3.Consultar las ventas de un producto entre dos fechas. \n ");
+        printf("\t4.Consultar las ventas de un producto para un cliente. \n\n ");
+        printf("\t0. Salir al menu principal.\n\n");
+ 
+        printf("\t"); scanf("%i",&op);
+ 
+        switch(op){
+            case 1: printf("Ingrese el Producto que desea consultar\n ");
+		    printf("\t"); scanf("%s",&nom);
+			/*el problema esta aqui, no me lee lo que escribo, sino que guarda basura y manda la funcion esa basura*/
+			/*segun yo creo que esta bien puesto pero no se*/
+		    consultapornombre(p,&nom[20]);
+                    break;
+            case 2: printf("Ingrese el codigo del Producto que desea consultar\n ");
+					/*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
+                    break;
+            case 3:
+                    break;
+			case 4: 
+				    break;
+        }
+       
+        system("pause");
+        system("cls");
+ 
+    }
 }
 
 void menuProductos(){
-	int op=-1; productos *p=NULL;
-	system("cls");
-	while(op){
-		printf("\t\tMENU PRODUCTOS. \n\n ");
-		printf("\t1.Agregar producto.\n ");
-		printf("\t2.Agregar existencia de producto.\n ");
-		printf("\t3.Consultar existencia de producto.\n ");
-		printf("\t4.Modificar producto.\n ");
-		printf("\t5.Eliminar producto.\n\n ");
-		printf("0. Salir al menu principal.\n\n");
-
-		scanf("%i",&op);
-		
-		switch(op){
-			case 1: agregarProductos(&p);
-					mostrarproductos(p);
-					break;
-			case 2: 
-					break;
-			case 3:
-					break;
-			case 4:
-					break;
-			case 5:
-					break;
-		}
-		system ("pause");
-		system("cls");
-
-	}
+    int op=-1; productos *p=NULL;
+    system("cls");
+    while(op){
+        printf("\t\tMENU PRODUCTOS. \n\n ");
+        printf("\t1.Agregar producto.\n ");
+        printf("\t2.Agregar existencia de producto.\n ");
+        printf("\t3.Consultar existencia de producto.\n ");
+        printf("\t4.Modificar producto.\n ");
+        printf("\t5.Eliminar producto.\n\n ");
+        printf("\t0. Salir al menu principal.\n\n");
+ 
+        printf("\t"); scanf("%i",&op);
+       
+        switch(op){
+            case 1:
+                    break;
+            case 2:
+                    break;
+            case 3:
+                    break;
+            case 4:
+                    break;
+            case 5:
+                    break;
+        }
+        system("pause");
+        system("cls");
+ 
+    }
 }
 
 void main(){
-	int op=-1;
-	productos *p=NULL;
-	while (op){
-		printf("\t\tMENU. \n\n ");
-		printf("\t1.Productos.\n ");
-		printf("\t2.Clientes.\n ");
-		printf("\t3.Ventas.\n ");
-		printf("\t4.Consultas.\n ");
-		printf("\t5.Guardar/Cargar datos de archivo.\n\n");
-		printf("0. Salir. \n\n");
-
-
-		scanf("%i",&op);
-
-		switch(op){
-			case 1: menuProductos();
-					break;
-			case 2: menuClientes();
-					break;
-			case 3:	
-					break;
-			case 4: menuConsultas();
-					break;
-			case 5:
-					break;
-
-		}
-		system("pause");
-		system("cls");
-	}
+    int op=-1;
+    while (op){
+        printf("\t\tMENU. \n\n ");
+        printf("\t1.Productos.\n ");
+        printf("\t2.Clientes.\n ");
+        printf("\t3.Ventas.\n ");
+        printf("\t4.Consultas.\n ");
+        printf("\t5.Guardar/Cargar datos de archivo.\n\n");
+        printf("\t0. Salir al menu principal.\n\n");
+ 
+ 
+        printf("\t"); scanf("%i",&op);
+ 
+        switch(op){
+            case 1: menuProductos();
+		    break;
+            case 2: menuClientes();
+                    break;
+            case 3: menuVentas();
+                    break;
+            case 4: menuConsultas();
+                    break;
+            case 5:
+                    break;
+ 
+        }
+        system("pause");
+        system("cls");
+    }
 }
