@@ -73,16 +73,17 @@ void mostrarproductos(productos *p){
 	printf(" NULL");
 }
 
-productos buscarProducto(productos*p,int cod){
+productos *buscarProducto(productos*p,int cod){
 	productos*t=p;
 	while(t){
 		if(t->codigo == cod)
-			return *t;
+			return t;
 		else 
 			t=t->sig;
 	}
-	return *t;
-};
+	return NULL;
+}
+
 /*
 void Ventas(productos*p){
 	int cod,ci,uni;
@@ -104,10 +105,9 @@ void Ventas(productos*p){
 	
 	
 	
-
 } */
 
-void consultapornombre(productos *p, char produc1[]){
+void consultapornombre(productos *p, char produc1[21]){
 	productos *auxp=p;
 	int igual=0;
 	while (auxp){
@@ -208,7 +208,7 @@ void menuConsultas(){
 		    printf("\t"); scanf("%s",&nom);
 			/*el problema esta aqui, no me lee lo que escribo, sino que guarda basura y manda la funcion esa basura*/
 			/*segun yo creo que esta bien puesto pero no se*/
-		    consultapornombre(p,&nom[20]);
+		    consultapornombre(p,nom);
                     break;
             case 2: printf("Ingrese el codigo del Producto que desea consultar\n ");
 					/*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
@@ -240,7 +240,7 @@ void menuProductos(){
         printf("\t"); scanf("%i",&op);
        
         switch(op){
-            case 1:
+            case 1:	agregarProductos(&p);
                     break;
             case 2:
                     break;
