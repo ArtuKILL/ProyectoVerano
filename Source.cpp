@@ -9,12 +9,13 @@ struct lote{
     int anno;
     int cantidad;
     int exitencia;
+    lote *sig;
 };
 
 struct productos{
     int codigo;
-    char desc[20];
-    char ramo[10];
+    char desc[21];
+    char ramo[11];
     productos *sig;
     lote *aba;
 };
@@ -27,7 +28,7 @@ struct factura{
 	int anno;
 	int ci;
 	long int total;
-	char desc[20];
+	char desc[21];
 	int numlote;
 	int precio;
 };
