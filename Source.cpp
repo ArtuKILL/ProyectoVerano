@@ -1,23 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+ 
 struct lote{
-	int numlot;
-	int	mes;
-	int dia;
-	int anno;
-	int precio;
-	int cantidad;
-	int exitencia;
-	lote* sig;
+    int numlot;
+    int mes;
+    int dia;
+    int anno;
+    int cantidad;
+    int exitencia;
 };
+
 struct productos{
-	int codigo;
-	char desc[21];
-	char ramo[11];
-	productos *sig;
-	lote *aba;
+    int codigo;
+    char desc[20];
+    char ramo[10];
+    productos *sig;
+    lote *aba;
 };
 
 struct factura{
@@ -54,12 +53,12 @@ void insertarProductos(productos**p,char desc[20],char ramo[10],int cod){
 
 void agregarProductos(productos **p){
 	int cod; char desc[21],ramo[11];
-	printf("\tNombre del producto.(descripcion):\n\t");
-	scanf("%s",&desc);
+	printf("\tNombre del producto.(descripcion):\n");
+	printf("\t"); scanf("%s",&desc); printf(" \n");
 	printf("\n\tRamo del producto:\n ");
-	scanf("%s",&ramo);
+	printf("\t"); scanf("%s",&ramo); printf(" \n");
 	printf("\n\tCodigo del producto\n ");
-	scanf("%i",&cod);
+	printf("\t"); scanf("%i",&cod); printf(" \n");
 	insertarProductos(&*p,desc,ramo,cod);
 }
 
@@ -107,6 +106,25 @@ void Ventas(productos*p){
 	
 } */
 
+/*void consultarporcodigo(productos *p, int codigo){
+	productos *auxp=p;
+	int igual;
+	while (auxp){
+		if(codigo==auxp->codigo){
+			printf("\t"); printf(" El producto de codigo %i", codigo, "si se encuentra en existencia \n\n");
+			lote *t=auxp->aba;
+			while (t){
+				printf("\t"); printf("El numero del lote del producto es %i", t->numlot, "\n");
+				printf("\t"); printf("La cantidad del lote del producto es %i", t->cantidad, "\n\n");
+				t=t->aba;
+			}
+			break;
+		}
+	}
+	if (!auxp)
+		printf("\t"); printf(" El producto de codigo %i", codigo, "no esta registrado \n\n");
+}*/
+
 void consultapornombre(productos *p, char produc1[]){
 	productos *auxp=p;
 	int igual=0;
@@ -119,7 +137,7 @@ void consultapornombre(productos *p, char produc1[]){
 		printf("\t"); printf("El codigo del producto %s", produc1);
 		printf(" es %i",auxp->codigo);
 		printf(" \n\n");
-	        break;
+	    break;
 	}
 	auxp=auxp->sig;
 	igual=0;
@@ -127,12 +145,12 @@ void consultapornombre(productos *p, char produc1[]){
 	if (!auxp){
 		printf("\t"); printf("El codigo del producto %s",produc1);
 		printf(" no existe, \n");
-	        printf("\t"); printf(" el producto %s",produc1);
+	    printf("\t"); printf(" el producto %s",produc1);
 		printf(" no esta registrado \n\n");
 	}
 }
 
-void menuClientes(){
+void menuClientes(cliente **t){
     int op=-1;
     system("cls");
     while (op){
@@ -158,7 +176,7 @@ void menuClientes(){
     }
 }
 
-void menuVentas(){
+void menuVentas(productos **p, cliente **t){
     int op=-1;
     system("cls");
     while (op){
@@ -183,10 +201,10 @@ void menuVentas(){
         system("cls");
     }
 }
-
-void menuConsultas(productos**p){
+ 
+void menuConsultas(productos *p, cliente *t){
     int op=-1,cod;
-    char nom[20];
+	char nom[20]="\0";
     system("cls");
     while(op){
         printf("\t\tMENU CONSULTAS. \n\n ");
@@ -200,16 +218,16 @@ void menuConsultas(productos**p){
  
         switch(op){
             case 1: printf(" \n"); printf("\tIngrese el Producto que desea consultar\n ");
-	            printf("\t"); scanf("%s",&nom); printf(" \n");
-		    consultapornombre(p,nom);
+				    printf("\t"); scanf("%s",&nom); printf(" \n");
+					consultapornombre(p,nom);
                     break;
             case 2: printf("Ingrese el codigo del Producto que desea consultar\n ");
-			/*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
+					/*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
                     break;
             case 3:
                     break;
-	    case 4: 
-		    break;
+			case 4: 
+				    break;
         }
        
         system("pause");
@@ -217,9 +235,9 @@ void menuConsultas(productos**p){
  
     }
 }
-
+ 
 void menuProductos(productos **p){
-    int op=-1; 
+    int op=-1;
     system("cls");
     while(op){
         printf("\t\tMENU PRODUCTOS. \n\n ");
@@ -233,7 +251,7 @@ void menuProductos(productos **p){
         printf("\t"); scanf("%i",&op);
        
         switch(op){
-            case 1:	agregarProductos(p);
+		    case 1: printf(" \n"); agregarProductos(p);
                     break;
             case 2:
                     break;
@@ -249,9 +267,10 @@ void menuProductos(productos **p){
  
     }
 }
-
+ 
 void main(){
-	int op=-1; productos *p = NULL;
+    int op=-1; productos *p = NULL;
+	cliente *t=NULL;
     while (op){
         printf("\t\tMENU. \n\n ");
         printf("\t1.Productos.\n ");
@@ -266,12 +285,12 @@ void main(){
  
         switch(op){
             case 1: menuProductos(&p);
-		    break;
-            case 2: menuClientes();
+				    break;
+            case 2: menuClientes(&t);
                     break;
-            case 3: menuVentas();
+            case 3: menuVentas(&p,&t);
                     break;
-            case 4: menuConsultas(&p);
+            case 4: menuConsultas(p,t);
                     break;
             case 5:
                     break;
