@@ -107,18 +107,18 @@ void Ventas(productos*p){
 	
 } */
 
-void consultapornombre(productos *p, char produc1[21]){
+void consultapornombre(productos *p, char produc1[]){
 	productos *auxp=p;
 	int igual=0;
 	while (auxp){
-       for (int i=0; i<20; i++) {
+       for (int i=0;produc1[i]!='\0'; i++){ // i<20
           if(produc1[i]!=auxp->desc[i])
             igual=-1;
 	   }
     if(igual==0){
 		printf("\t"); printf("El codigo del producto ");
 		for (int c=0;produc1[c]!='\0';c++)
-			printf(" %s",produc1[c]);
+			printf("%c",produc1[c]);
 		printf("es %i",auxp->codigo,"\n\n");
 	    break;
 	}
@@ -126,11 +126,11 @@ void consultapornombre(productos *p, char produc1[21]){
 	if (!auxp && igual!=0){
 		printf("\t"); printf("El codigo del producto ");
 		for (int c=0;produc1[c]!='\0';c++)
-			printf(" %s",produc1[c]);
+			printf(" %c",produc1[c]);
 		printf(" no existe, \n");
 	    printf("\t"); printf(" El producto ");
 		for (int c=0;produc1[c]!='\0';c++)
-			printf(" %s",produc1[c]);
+			printf(" %c",produc1[c]);
 		printf("no esta registrado \n\n");
 	}
 	}
@@ -188,10 +188,9 @@ void menuVentas(){
     }
 }
 
-void menuConsultas(){
+void menuConsultas(productos**p){
     int op=-1,cod;
     char nom[20];
-    productos *p=NULL;
     system("cls");
     while(op){
         printf("\t\tMENU CONSULTAS. \n\n ");
@@ -204,11 +203,13 @@ void menuConsultas(){
         printf("\t"); scanf("%i",&op);
  
         switch(op){
-            case 1: printf("Ingrese el Producto que desea consultar\n ");
+            case 1: 
+			mostrarproductos(*p);	
+			printf("Ingrese el Producto que desea consultar\n ");
 		    printf("\t"); scanf("%s",&nom);
 			/*el problema esta aqui, no me lee lo que escribo, sino que guarda basura y manda la funcion esa basura*/
 			/*segun yo creo que esta bien puesto pero no se*/
-		    consultapornombre(p,nom);
+		    consultapornombre(*p,nom);
                     break;
             case 2: printf("Ingrese el codigo del Producto que desea consultar\n ");
 					/*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
@@ -225,8 +226,8 @@ void menuConsultas(){
     }
 }
 
-void menuProductos(){
-    int op=-1; productos *p=NULL;
+void menuProductos(productos **p){
+    int op=-1; 
     system("cls");
     while(op){
         printf("\t\tMENU PRODUCTOS. \n\n ");
@@ -240,7 +241,7 @@ void menuProductos(){
         printf("\t"); scanf("%i",&op);
        
         switch(op){
-            case 1:	agregarProductos(&p);
+            case 1:	agregarProductos(p);
                     break;
             case 2:
                     break;
@@ -258,7 +259,7 @@ void menuProductos(){
 }
 
 void main(){
-    int op=-1;
+	int op=-1; productos *p = NULL;
     while (op){
         printf("\t\tMENU. \n\n ");
         printf("\t1.Productos.\n ");
@@ -272,13 +273,13 @@ void main(){
         printf("\t"); scanf("%i",&op);
  
         switch(op){
-            case 1: menuProductos();
+            case 1: menuProductos(&p);
 		    break;
             case 2: menuClientes();
                     break;
             case 3: menuVentas();
                     break;
-            case 4: menuConsultas();
+            case 4: menuConsultas(&p);
                     break;
             case 5:
                     break;
