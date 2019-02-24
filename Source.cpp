@@ -111,28 +111,24 @@ void consultapornombre(productos *p, char produc1[]){
 	productos *auxp=p;
 	int igual=0;
 	while (auxp){
-       for (int i=0;produc1[i]!='\0'; i++){ // i<20
+       for (int i=0;produc1[i]!='\0'; i++){
           if(produc1[i]!=auxp->desc[i])
             igual=-1;
 	   }
     if(igual==0){
-		printf("\t"); printf("El codigo del producto ");
-		for (int c=0;produc1[c]!='\0';c++)
-			printf("%c",produc1[c]);
-		printf("es %i",auxp->codigo,"\n\n");
-	    break;
+		printf("\t"); printf("El codigo del producto %s", produc1);
+		printf(" es %i",auxp->codigo);
+		printf(" \n\n");
+	        break;
 	}
 	auxp=auxp->sig;
-	if (!auxp && igual!=0){
-		printf("\t"); printf("El codigo del producto ");
-		for (int c=0;produc1[c]!='\0';c++)
-			printf(" %c",produc1[c]);
-		printf(" no existe, \n");
-	    printf("\t"); printf(" El producto ");
-		for (int c=0;produc1[c]!='\0';c++)
-			printf(" %c",produc1[c]);
-		printf("no esta registrado \n\n");
+	igual=0;
 	}
+	if (!auxp){
+		printf("\t"); printf("El codigo del producto %s",produc1);
+		printf(" no existe, \n");
+	        printf("\t"); printf(" el producto %s",produc1);
+		printf(" no esta registrado \n\n");
 	}
 }
 
@@ -203,21 +199,17 @@ void menuConsultas(productos**p){
         printf("\t"); scanf("%i",&op);
  
         switch(op){
-            case 1: 
-			mostrarproductos(*p);	
-			printf("Ingrese el Producto que desea consultar\n ");
-		    printf("\t"); scanf("%s",&nom);
-			/*el problema esta aqui, no me lee lo que escribo, sino que guarda basura y manda la funcion esa basura*/
-			/*segun yo creo que esta bien puesto pero no se*/
-		    consultapornombre(*p,nom);
+            case 1: printf(" \n"); printf("\tIngrese el Producto que desea consultar\n ");
+	            printf("\t"); scanf("%s",&nom); printf(" \n");
+		    consultapornombre(p,nom);
                     break;
             case 2: printf("Ingrese el codigo del Producto que desea consultar\n ");
-					/*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
+			/*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
                     break;
             case 3:
                     break;
-			case 4: 
-				    break;
+	    case 4: 
+		    break;
         }
        
         system("pause");
