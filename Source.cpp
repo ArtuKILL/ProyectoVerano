@@ -9,7 +9,7 @@ struct lote{
     int anno;
     int cantidad;
     int exitencia;
-    lote *sig;
+    lote *aba;
 };
 
 struct productos{
@@ -31,13 +31,11 @@ struct factura{
 	char desc[21];
 	int numlote;
 	int precio;
+	factura *aba;
 };
 
 struct cliente{
 	int ci;
-	char nomapellido[20];
-	char direc[15];
-	int numerotlf[12];
 	cliente *sig;
 	factura *aba;
 };
@@ -151,8 +149,41 @@ void consultapornombre(productos *p, char produc1[]){
 	}
 }
 
+void agregarcliente(cliente **p,int x){
+	cliente *aux=new cliente;
+	cliente *t=*p;
+	aux->ci=x;
+	if (!(*p)){
+		*p=aux;
+	    (*p)->sig=NULL;
+	}
+	else{
+		while (t && (t->ci!=aux->ci))
+			t=t->sig;
+		if (!t){
+		    aux->sig=*p;
+		    (*p)->sig=NULL;
+		    *p=aux;
+		}
+		else
+			printf("\n\tEl cliente que desea agregar ya se encuentra registrado \n\n");
+	}
+	t=*p;
+}
+
+void mostrarcliente(cliente **t){
+	cliente *o = *t;
+	printf("\n\t Clientes-> ");
+	while(o){
+		printf("[%i]->",o->ci);
+		o=o->sig;
+	}
+	printf("NULL \n\n");
+}
+
+
 void menuClientes(cliente **t){
-    int op=-1;
+    int op=-1, x=0;
     system("cls");
     while (op){
         printf("\t\tMENU CLIENTES. \n\n ");
@@ -164,9 +195,11 @@ void menuClientes(cliente **t){
         printf("\t"); scanf("%i",&op);
        
         switch(op){
-            case 1:
+            case 1: printf(" \n"); printf("\tIngrese el Codigo de Cliente que desea agregar \n ");
+				    printf("\t"); scanf("%i",&x); printf(" \n");
+					agregarcliente(t,x);
                     break;
-            case 2:
+			case 2: mostrarcliente(t);
                     break;
             case 3:
                     break;
