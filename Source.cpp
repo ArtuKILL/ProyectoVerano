@@ -226,6 +226,17 @@ void insertarL(productos*p,int cod){
     
 }
 
+int existenciaP(productos*p){
+    int sum = 0;
+    if (p){
+        lote *t = p->aba;
+        while (t){
+            sum += t->exist;
+        }
+    }
+    return sum;
+}
+    
 
 
 void menuClientes(cliente **t){
@@ -317,7 +328,7 @@ void menuConsultas(productos *p, cliente *t){
 }
 
 void menuProductos(productos **p){
-    int op=-1, cod; //productos * xx = NULL; //quitar
+    int op=-1, cod; productos * xx = NULL; //quitar
     system("cls");
     while(op){
         printf("\t\tMENU PRODUCTOS. \n\n ");
@@ -337,13 +348,17 @@ void menuProductos(productos **p){
                     scanf("%i",&cod);
                     insertarL(*p, cod);
                     break;
-             /*case 3: printf("Indique el codigo del producto: \n");
+             /*case n: printf("Indique el codigo del producto: \n");
                     scanf("%i",&cod);
                     xx = buscarProducto(*p, cod);
                     mostrarSub(xx);
                     break; */ //Mostrar Lotes de sublista;
-            case 3:
-                break;
+            case 3: printf("Indique el codigo del producto: \n");
+                    scanf("%i",&cod);
+                    xx = buscarProducto(*p, cod);
+                    if (xx)
+                        printf("Hay %i unidades de %s \n",existenciaP(xx),xx->desc);
+                    break;
             case 4:
                 break;
             case 5:
