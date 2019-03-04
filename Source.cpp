@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <ctime>
 
+
 struct lote{
     int numlot;
     int mes;
@@ -13,6 +14,7 @@ struct lote{
     int precio;
     lote *aba;
 };
+
 
 struct productos{
     int codigo;
@@ -48,8 +50,7 @@ void tiempo(){
     time(&tiemp);
     info = localtime(&tiemp);
     printf("Fecha: %i/%i/%i\n",info->tm_mday,info->tm_mon,info->tm_year%100);
-    printf("Hora:");
-    
+    printf("\t\t\t\t\t\t Hora:  %i:%i\n",info->tm_hour,info->tm_min);
 }
 
 void insertarProductos(productos**p,char desc[20],char ramo[10],int cod){ //Inserta Producto por cabeza
@@ -84,7 +85,7 @@ void agregarProductos(productos **p){
         f=1;
     }while(codRep(*p, cod));
     printf(" \n");
-        
+    
     insertarProductos(&*p,desc,ramo,cod);
 }
 
@@ -200,7 +201,7 @@ void agregarcliente(cliente **p,int x){
     if (!(*p)){
         *p=aux;
         (*p)->sig=NULL;
-		(*p)->aba=NULL;
+        (*p)->aba=NULL;
     }
     else{
         while (t && (t->ci!=aux->ci))
@@ -208,23 +209,23 @@ void agregarcliente(cliente **p,int x){
         if (!t){
             aux->sig=*p;
             *p=aux;
-			(*p)->aba=NULL;
+            (*p)->aba=NULL;
         }
     }
     t=*p;
 }
 
 void consultarcliente(cliente **t, int ci){
-	cliente *aux=*t;
-	while (aux){
-	   if (aux->ci==ci){
-		 printf("\n\tEl cliente se encuentra registrado \n\n");
-		 return;
-	   }
-	   else
-		   aux=aux->sig;
-	}
-	printf("\n\tEl cliente no se encuentra registrado \n\n");
+    cliente *aux=*t;
+    while (aux){
+        if (aux->ci==ci){
+            printf("\n\tEl cliente se encuentra registrado \n\n");
+            return;
+        }
+        else
+            aux=aux->sig;
+    }
+    printf("\n\tEl cliente no se encuentra registrado \n\n");
 }
 
 void mostrarcliente(cliente **t){
@@ -321,40 +322,40 @@ void elimProducto(productos**p,int cod){
             aux->sig = aux->sig->sig;
             delete t;
         }
-        }
+    }
 }
 
 void insertarfactclientef(cliente **t, cliente *auxt, factura *we, factura *w){ /*adjunta las facturas al cliente fantasma*/
-	cliente *re=auxt->sig;
-	while (re->sig)
-		re=re->sig;
-	if (re->aba){
-		we=re->aba;
-		while (we->aba)
-		  we=we->aba;
-		we->aba=w;
-	}
-	else
-		re->aba=w;
+    cliente *re=auxt->sig;
+    while (re->sig)
+        re=re->sig;
+    if (re->aba){
+        we=re->aba;
+        while (we->aba)
+            we=we->aba;
+        we->aba=w;
+    }
+    else
+        re->aba=w;
 }
 
 
 void eliminarcliente(cliente **t, int ci){
-	cliente *auxt=(*t);
-	factura *w=auxt->sig->aba, *we;
-	cliente *te=auxt->sig;
-	while (auxt && auxt->sig){
-		if (auxt->sig->ci==ci){
-			te=auxt->sig;
-			auxt->sig=te->sig;
-			delete te;
-			if (w)
-				insertarfactclientef(t,auxt,we,w);
-			cliente *te=auxt->sig;
-		}
-		else
-			auxt=auxt->sig;
-	}
+    cliente *auxt=(*t);
+    factura *w=auxt->sig->aba, *we;
+    cliente *te=auxt->sig;
+    while (auxt && auxt->sig){
+        if (auxt->sig->ci==ci){
+            te=auxt->sig;
+            auxt->sig=te->sig;
+            delete te;
+            if (w)
+                insertarfactclientef(t,auxt,we,w);
+            cliente *te=auxt->sig;
+        }
+        else
+            auxt=auxt->sig;
+    }
 }
 
 
@@ -372,19 +373,19 @@ void menuClientes(cliente **t){
         
         switch(op){
             case 1: printf(" \n"); printf("\tIngrese el Codigo de Cliente que desea Agregar \n ");
-                    printf("\t"); scanf("%i",&x); printf("\n ");
-                    agregarcliente(t,x);
-                    break;
+                printf("\t"); scanf("%i",&x); printf("\n ");
+                agregarcliente(t,x);
+                break;
             case 2: printf(" \n"); printf("\tIngrese el Codigo de Cliente que desea Consultar \n ");
-                    printf("\t"); scanf("%i",&x); printf("\n ");
-				    consultarcliente(t,x);
-                    break;
+                printf("\t"); scanf("%i",&x); printf("\n ");
+                consultarcliente(t,x);
+                break;
             case 3: printf(" \n"); printf("\tIngrese el Codigo de Cliente que desea Eliminar \n ");
-                    printf("\t"); scanf("%i",&x); printf("\n ");
-                    eliminarcliente(t,x);
-                    break;
-			case 4: mostrarcliente(t);
-				    break;
+                printf("\t"); scanf("%i",&x); printf("\n ");
+                eliminarcliente(t,x);
+                break;
+            case 4: mostrarcliente(t);
+                break;
         }
         
         system("pause");
@@ -462,20 +463,20 @@ void menuModificar(productos *p,productos *cab){ //recordar que se pasa el apunt
             printf("\t2.Cambiar ramo.\n ");
             printf("\t3.Cambiar codigo.\n\n ");
             printf("\t0.Salir al menu de productos..\n\n");
-        
+            
             scanf("%i",&op);
-        
+            
             switch (op) {
                 case 1:
                     printf("Descripcion actual-> %s \n",p->desc);
                     printf("Descripcion nueva-> "); scanf("%s",&(p->desc));
                     break;
-                
+                    
                 case 2:
                     printf("Ramo actual-> %s \n",p->ramo);
                     printf("Ramo nuevo-> "); scanf("%s",&(p->ramo));
                     break;
-                
+                    
                 case 3:
                     int f =0; /* el flag es para que no muestre el mensaje de cod rep en la primera
                                iteracion */
@@ -489,8 +490,8 @@ void menuModificar(productos *p,productos *cab){ //recordar que se pasa el apunt
                     p->codigo = cod;
                     break;
             }
-     
-        
+            
+            
             system("pause");
             system("cls");
         }
@@ -517,58 +518,58 @@ void menuProductos(productos **p){
         
         switch(op){
             case 1: printf(" \n"); agregarProductos(&*p);
-                    break;
+                break;
             case 2: printf("\tIndique el codigo del producto: \n\t");
-                    scanf("%i",&cod);
-                    insertarL(*p, cod);
-                    break;
+                scanf("%i",&cod);
+                insertarL(*p, cod);
+                break;
             case 6: printf("\tIndique el codigo del producto: \n\t");
-                    scanf("%i",&cod);
-                    xx = buscarProducto(*p, cod);
-                    mostrarSub(xx);
-                    break;  //Esta funcion no va aca es para ver si inserto bien en la sublista
-                             //deberia salir [NOMBRE] <-producto
-                              //                  [numero de existencia]->...
+                scanf("%i",&cod);
+                xx = buscarProducto(*p, cod);
+                mostrarSub(xx);
+                break;  //Esta funcion no va aca es para ver si inserto bien en la sublista
+                //deberia salir [NOMBRE] <-producto
+                //                  [numero de existencia]->...
                 
             case 3: printf("\tIndique el codigo del producto: \n\t");
-                    scanf("%i",&cod);
-                    xx = buscarProducto(*p, cod);
-                    if (xx)
-                        printf("\tHay %i unidades de %s \n",existenciaP(xx),xx->desc);
-                    break;
+                scanf("%i",&cod);
+                xx = buscarProducto(*p, cod);
+                if (xx)
+                    printf("\tHay %i unidades de %s \n",existenciaP(xx),xx->desc);
+                break;
             case 4: printf("\tIndique el codigo del producto: \n\t");
-                    scanf("%i",&cod);
-                    xx = buscarProducto(*p, cod);
-                    menuModificar(xx,*p);
-                    break;
+                scanf("%i",&cod);
+                xx = buscarProducto(*p, cod);
+                menuModificar(xx,*p);
+                break;
             case 5: printf("\tIndique el codigo del producto: \n\t");
-                    scanf("%i",&cod);
-                    elimProducto(&*p,cod);
-                    break;
+                scanf("%i",&cod);
+                elimProducto(&*p,cod);
+                break;
             case 7: mostrarproductos(*p);
-                    break;
+                break;
         }
         system("pause");
         system("cls");
         
     }
 }
-void main(){
+int main(){
     int op=-1; productos *p = NULL;
     cliente *t= NULL;
     while (op){
-        printf("\t\tMENU. \n\n ");
+        printf("\t\tMENU. \t\t\t ");tiempo();
         printf("\t1.Productos.\n ");
         printf("\t2.Clientes.\n ");
         printf("\t3.Ventas.\n ");
         printf("\t4.Consultas.\n ");
         printf("\t5.Guardar/Cargar datos de archivo.\n\n");
         printf("\t0. Salir.\n\n");
-	printf("\t\t");
-        tiempo();
+        printf("\t\t");
         
         
-        printf("\t"); scanf("%i",&op);
+        
+        printf("\t\n"); scanf("%i",&op);
         
         switch(op){
             case 1: menuProductos(&p);
@@ -586,4 +587,5 @@ void main(){
         system("pause");
         system("cls");
     }
+    return 1;
 }
