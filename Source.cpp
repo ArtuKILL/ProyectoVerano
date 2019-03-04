@@ -45,12 +45,14 @@ struct cliente{
 };
 
 void tiempo(){
+    char buffer[26];
     time_t tiemp;
     struct tm *info;
     time(&tiemp);
     info = localtime(&tiemp);
     printf("Fecha: %i/%i/%i\n",info->tm_mday,info->tm_mon,info->tm_year%100);
-    printf("\t\t\t\t\t\t Hora:  %i:%i\n",info->tm_hour,info->tm_min);
+    strftime(buffer, 26, "%H:%M",info);
+    printf("\t\t\t\t\t\t Hora:   %s\n",buffer);
 }
 
 void insertarProductos(productos**p,char desc[20],char ramo[10],int cod){ //Inserta Producto por cabeza
@@ -257,27 +259,52 @@ int contarl(lote*p){
 }
 
 void insertarL(productos*p,int cod){ //Inserta lote por cola.
-    int dia,mes,anno,cant,precio;
+    time_t tiemp;
+    tm *info;
+    time(&tiemp);
+    info = localtime(&tiemp);
+    int dia=info->tm_mday,mes=info->tm_mon,anno=info->tm_year%100,cant=0,precio=0,op=-1;
     productos* t = buscarProducto(p,cod);
     if (t){
-        lote* tt= t->aba;
-        printf("\tIntroduzca Dia/Mes/Año : \n");
-        printf("\tDia-> "); scanf("%i",&dia);
-        printf("\tMes-> "); scanf("%i",&mes);
-        printf("\tAño-> "); scanf("%i",&anno);
-        printf("\n\tIntroduzca cantidad del lote: \n\t");
-        scanf("%i",&cant);
-        printf("\tIntroduzca precio del lote: \n\t");
-        scanf("%i",&precio);
-        while (tt && tt->aba)
-            tt= tt->aba;
-        if (tt){
-            tt->aba = crearL(dia,mes,anno,cant,precio);
-            tt->aba->numlot = contarl(p->aba);
-        }
-        else{
-            t->aba = crearL(dia,mes,anno,cant,precio);
-            t->aba->numlot = 1;
+        while (op){
+            printf("\t\tAGREGAR EXISTENCIA. \n\n");
+            printf("\t1.Fecha de hoy. (Automatico).\n");
+            printf("\t2.Establecer fecha (Manual).\n\n");
+            printf("\t0. Salir a menu PRODUCTOS.\n\n");
+            
+            scanf("%i",&op);
+            
+            switch (op) {
+                case 1:
+                    scanf("%i",&cant);
+                    printf("\tIntroduzca precio del lote: \n\t");
+                    scanf("%i",&precio);
+                    
+                case 2:
+                    
+                    printf("\tIntroduzca Dia/Mes/Año : \n");
+                    printf("\tDia-> "); scanf("%i",&dia);
+                    printf("\tMes-> "); scanf("%i",&mes);
+                    printf("\tAño-> "); scanf("%i",&anno);
+                    printf("\n\tIntroduzca cantidad del lote: \n\t");
+                    scanf("%i",&cant);
+                    printf("\tIntroduzca precio del lote: \n\t");
+                    scanf("%i",&precio);
+            }
+            lote* tt= t->aba;
+            while (tt && tt->aba)
+                tt= tt->aba;
+            if (tt){
+                tt->aba = crearL(dia,mes,anno,cant,precio);
+                tt->aba->numlot = contarl(p->aba);
+            }
+            else{
+                t->aba = crearL(dia,mes,anno,cant,precio);
+                t->aba->numlot = 1;
+            }
+            system("pause");
+            system("cls");
+            break;
         }
     }
     else
@@ -558,7 +585,7 @@ int main(){
     int op=-1; productos *p = NULL;
     cliente *t= NULL;
     while (op){
-        printf("\t\tMENU. \t\t\t ");tiempo();
+        printf("\n\n\t\tMENU. \t\t\t ");tiempo();
         printf("\t1.Productos.\n ");
         printf("\t2.Clientes.\n ");
         printf("\t3.Ventas.\n ");
