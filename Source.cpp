@@ -93,7 +93,7 @@ void mostrarSub(productos *p){ //Muestra la sub lista de un producto (p apunta a
         lote*t = p->aba;
         printf("[%s] \n\t",p->desc);
         while(t){
-            printf("[%i]->",t->cant);
+            printf("[%i,%i]->",t->numlot,t->cant);
             t=t->aba;
         }
     }
@@ -230,6 +230,12 @@ lote *crearL(int dia,int mes, int anno,int cant, int precio){ //crea un lote (so
     t->aba = NULL;
     return t;
 }
+int contarl(lote*p){
+    if (p){
+        return contarl(p->aba)+1;
+    }
+    return 0;
+}
 
 void insertarL(productos*p,int cod){ //Inserta lote por cola.
     int dia,mes,anno,cant,precio;
@@ -246,10 +252,14 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
         scanf("%i",&precio);
         while (tt && tt->aba)
             tt= tt->aba;
-        if (tt)
+        if (tt){
             tt->aba = crearL(dia,mes,anno,cant,precio);
-        else
+            tt->aba->numlot = contarl(p->aba);
+        }
+        else{
             t->aba = crearL(dia,mes,anno,cant,precio);
+            t->aba->numlot = 1;
+        }
     }
     else
         printf("\tProducto no encontrado... (Codigo errado) \n ");
