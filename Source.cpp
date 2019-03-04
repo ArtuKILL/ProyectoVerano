@@ -283,9 +283,15 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
                 case 2:
                     
                     printf("\tIntroduzca Dia/Mes/Año : \n");
+                    do{
                     printf("\tDia-> "); scanf("%i",&dia);
+                    }while (dia<=0 || dia>=32);
+                    do{
                     printf("\tMes-> "); scanf("%i",&mes);
+                    }while(mes<=0 || mes>=13);
+                    do{
                     printf("\tAño-> "); scanf("%i",&anno);
+                    }while(anno>1000);
                     printf("\n\tIntroduzca cantidad del lote: \n\t");
                     scanf("%i",&cant);
                     printf("\tIntroduzca precio del lote: \n\t");
