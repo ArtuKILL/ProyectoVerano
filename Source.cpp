@@ -52,15 +52,30 @@ void insertarProductos(productos**p,char desc[20],char ramo[10],int cod){ //Inse
     t->aba = NULL;
     *p = t;
 }
+int codRep(productos *p,int x){ //Arroja 1 si hay un codigo rep, 0 si no hay.
+    while(p){
+        if(p->codigo == x)
+            return 1;
+        p=p->sig;
+    }
+    return 0;
+}
 
 void agregarProductos(productos **p){
-    int cod; char desc[21],ramo[11];    //tp1
+    int cod,f=0; char desc[21],ramo[11];    //tp1
     printf("\tNombre del producto.(descripcion):\n");
     printf("\t"); scanf("%s",&desc); printf(" \n");
     printf("\n\tRamo del producto:\n ");
     printf("\t"); scanf("%s",&ramo); printf(" \n");
     printf("\n\tCodigo del producto\n ");
-    printf("\t"); scanf("%i",&cod); printf(" \n");
+    printf("\t");
+    do{
+        if(f) printf("\tCodigo en uso...\n\t");
+        scanf("%i",&cod);
+        f=1;
+    }while(codRep(*p, cod));
+    printf(" \n");
+        
     insertarProductos(&*p,desc,ramo,cod);
 }
 
@@ -70,7 +85,7 @@ void mostrarproductos(productos *p){ //Muestra los productos con su CODIGO,DESCR
         printf("[%i,%s,%s]->",p->codigo,p->desc,p->ramo);
         p=p->sig;
     }
-    printf(" NULL");
+    printf(" NULL \n");
 }
 
 void mostrarSub(productos *p){ //Muestra la sub lista de un producto (p apunta al producto)
@@ -119,24 +134,33 @@ productos *buscarProducto(productos*p,int cod){ //Develve el apuntador del produ
  
  } */
 
-/*void consultarporcodigo(productos *p, int codigo){
- productos *auxp=p;
- int igual;
- while (auxp){
- if(codigo==auxp->codigo){
- printf("\t"); printf(" El producto de codigo %i", codigo, "si se encuentra en existencia \n\n");
- lote *t=auxp->aba;
- while (t){
- printf("\t"); printf("El numero del lote del producto es %i", t->numlot, "\n");
- printf("\t"); printf("La cantidad del lote del producto es %i", t->cantidad, "\n\n");
- t=t->aba;
- }
- break;
- }
- }
- if (!auxp)
- printf("\t"); printf(" El producto de codigo %i", codigo, "no esta registrado \n\n");
- }*/
+void consultarporcodigo(productos *p, int codigo){
+    productos *auxp=p;
+    bool cont=1;
+    int cod=codigo;
+    while (auxp){
+        if(cod==auxp->codigo){
+            printf("\t"); printf("El producto de codigo %i", cod); printf(" si se encuentra en existencia ");
+            printf("\n\n ");
+            lote *t=auxp->aba;
+            while (t){
+                printf("\t"); printf("El numero del lote del producto es %i", t->numlot);
+                printf("\n ");
+                printf("\t"); printf("La cantidad del lote del producto es %i", t->cant);
+                printf("\n ");
+                printf("\t"); printf("La existencia del lote de este producto es %i", t->exist);
+                printf("\n\n ");
+                t=t->aba;
+            }
+            cont=0;
+        }
+        auxp=auxp->sig;
+    }
+    if (cont){
+        printf("\t"); printf(" El producto de codigo %i", cod); printf( " no esta registrado ");
+        printf("\n\n ");
+    }
+}
 
 void consultapornombre(productos *p, char produc1[]){
     productos *auxp=p;
@@ -212,13 +236,13 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
     productos* t = buscarProducto(p,cod);
     if (t){
         lote* tt= t->aba;
-        printf("Introduzca Dia/Mes/Año : \n");
-        printf("Dia-> "); scanf("%i",&dia);
-        printf("\nMes-> "); scanf("%i",&mes);
-        printf("\nAño-> "); scanf("%i",&anno);
-        printf("\nIntroduzca cantidad del lote: \n");
+        printf("\tIntroduzca Dia/Mes/Año : \n");
+        printf("\tDia-> "); scanf("%i",&dia);
+        printf("\tMes-> "); scanf("%i",&mes);
+        printf("\tAño-> "); scanf("%i",&anno);
+        printf("\n\tIntroduzca cantidad del lote: \n\t");
         scanf("%i",&cant);
-        printf("Introduzca precio del lote: \n");
+        printf("\tIntroduzca precio del lote: \n\t");
         scanf("%i",&precio);
         while (tt && tt->aba)
             tt= tt->aba;
@@ -228,7 +252,7 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
             t->aba = crearL(dia,mes,anno,cant,precio);
     }
     else
-        printf("Producto no encontrado... (Codigo errado) \n ");
+        printf("\tProducto no encontrado... (Codigo errado) \n ");
     
 }
 
@@ -243,14 +267,34 @@ int existenciaP(productos*p){ //Suma de las existencia de los lotes
     }
     return sum;
 }
-int codRep(productos *p,int x){ //Arroja 1 si hay un codigo rep, 0 si no hay.
-    while(p){
-        if(p->codigo == x)
-            return 1;
-        p=p->sig;
+
+void elimSub(lote**p){
+    lote * temp;
+    while(*p){
+        temp = (*p);
+        (*p)=(*p)->aba;
+        delete temp;
     }
-    return 0;
+    
 }
+void elimProducto(productos**p,int cod){
+    productos* t = buscarProducto(*p, cod);
+    if (t){
+        if (t->codigo == (*p)->codigo){
+            (*p)=(*p)->sig;
+            elimSub(&(t->aba));
+            delete t;
+        }
+        else {
+            productos *aux = *p;
+            while (aux->sig != t)
+                aux = aux->sig;
+            aux->sig = aux->sig->sig;
+            delete t;
+        }
+        }
+}
+
 
     
 
@@ -327,8 +371,10 @@ void menuConsultas(productos *p, cliente *t){
                 printf("\t"); scanf("%s",&nom[20]); printf(" \n");
                 consultapornombre(p,nom);
                 break;
-            case 2: printf("Ingrese el codigo del Producto que desea consultar\n ");
-                /*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/ //ya la programe se llama codRep
+            case 2: printf("\tIngrese el codigo del Producto que desea consultar\n ");
+                /*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
+                printf("\t"); scanf("%i",&cod); printf(" \n");
+                consultarporcodigo(p,cod);
                 break;
             case 3:
                 break;
@@ -338,13 +384,11 @@ void menuConsultas(productos *p, cliente *t){
         
         system("pause");
         system("cls");
-
-        
     }
 }
 
 
-void menuModificar(productos *p){ //recordar que se pasa el apuntador ya apuntando al producto...
+void menuModificar(productos *p,productos *cab){ //recordar que se pasa el apuntador ya apuntando al producto...
     int op = -1, cod;
     if (p){
         while (op){
@@ -352,7 +396,7 @@ void menuModificar(productos *p){ //recordar que se pasa el apuntador ya apuntan
             printf("\t1.Cambiar descripcion(nombre).\n ");
             printf("\t2.Cambiar ramo.\n ");
             printf("\t3.Cambiar codigo.\n\n ");
-            printf("\t0.Salir al menu principal.\n\n");
+            printf("\t0.Salir al menu de productos..\n\n");
         
             scanf("%i",&op);
         
@@ -364,7 +408,7 @@ void menuModificar(productos *p){ //recordar que se pasa el apuntador ya apuntan
                 
                 case 2:
                     printf("Ramo actual-> %s \n",p->ramo);
-                    printf("Ramo nuevo-> "); scanf("%s",&(p->desc));
+                    printf("Ramo nuevo-> "); scanf("%s",&(p->ramo));
                     break;
                 
                 case 3:
@@ -376,7 +420,8 @@ void menuModificar(productos *p){ //recordar que se pasa el apuntador ya apuntan
                         if(f) printf("Codigo repetido... \n");
                         scanf("%i",&(cod));
                         f = 1;
-                    }while(codRep(p,cod));
+                    }while(codRep(cab,cod));
+                    p->codigo = cod;
                     break;
             }
      
@@ -397,39 +442,46 @@ void menuProductos(productos **p){
         printf("\t2.Agregar existencia de producto.\n ");
         printf("\t3.Consultar existencia de producto.\n ");
         printf("\t4.Modificar producto.\n ");
-        printf("\t5.Eliminar producto.\n\n ");
+        printf("\t5.Eliminar producto.\n ");
+        printf("\t6.Mostrar lotes de un producto.\n ");
+        printf("\t7.Mostrar Productos. \n\n");
         printf("\t0. Salir al menu principal.\n\n");
+        
         
         printf("\t"); scanf("%i",&op);
         
         switch(op){
             case 1: printf(" \n"); agregarProductos(&*p);
                     break;
-            case 2: printf("Indique el codigo del producto: \n");
+            case 2: printf("\tIndique el codigo del producto: \n\t");
                     scanf("%i",&cod);
                     insertarL(*p, cod);
                     break;
-             case 5: printf("Indique el codigo del producto: \n");
+            case 6: printf("\tIndique el codigo del producto: \n\t");
                     scanf("%i",&cod);
                     xx = buscarProducto(*p, cod);
                     mostrarSub(xx);
-                    break;  /*Esta funcion no va aca es para ver si inserto bien en la sublista
-                             deberia salir [NOMBRE] <-producto
-                                                [numero de existencia]->...
-                             */
-            case 3: printf("Indique el codigo del producto: \n");
+                    break;  //Esta funcion no va aca es para ver si inserto bien en la sublista
+                             //deberia salir [NOMBRE] <-producto
+                              //                  [numero de existencia]->...
+                
+            case 3: printf("\tIndique el codigo del producto: \n\t");
                     scanf("%i",&cod);
                     xx = buscarProducto(*p, cod);
                     if (xx)
-                        printf("Hay %i unidades de %s \n",existenciaP(xx),xx->desc);
+                        printf("\tHay %i unidades de %s \n",existenciaP(xx),xx->desc);
                     break;
-            case 4: printf("Indique el codigo del producto: \n");
+            case 4: printf("\tIndique el codigo del producto: \n\t");
                     scanf("%i",&cod);
                     xx = buscarProducto(*p, cod);
-                    menuModificar(xx);
+                    menuModificar(xx,*p);
                     break;
-           /* case 5:
-                    break; */
+            case 5: printf("\tIndique el codigo del producto: \n\t");
+                    scanf("%i",&cod);
+                    elimProducto(&*p,cod);
+                    break;
+            case 7: mostrarproductos(*p);
+                    break;
         }
         system("pause");
         system("cls");
