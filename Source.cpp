@@ -42,6 +42,16 @@ struct cliente{
     factura *aba;
 };
 
+void tiempo(){
+    time_t tiemp;
+    struct tm *info;
+    time(&tiemp);
+    info = localtime(&tiemp);
+    printf("Fecha: %i/%i/%i\n",info->tm_mday,info->tm_mon,info->tm_year%100);
+    printf("Hora:");
+    
+}
+
 void insertarProductos(productos**p,char desc[20],char ramo[10],int cod){ //Inserta Producto por cabeza
     productos *t= new productos;
     strcpy(t->ramo,ramo);
@@ -554,6 +564,8 @@ void main(){
         printf("\t4.Consultas.\n ");
         printf("\t5.Guardar/Cargar datos de archivo.\n\n");
         printf("\t0. Salir.\n\n");
+	printf("\t\t");
+        tiempo();
         
         
         printf("\t"); scanf("%i",&op);
