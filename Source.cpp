@@ -197,7 +197,7 @@ void consultapornombre(productos *p, char produc1[]){
         printf(" no esta registrado \n\n");
     }
 }
-void restar_lote(lote*p, int cant){
+/*void restar_lote(lote*p, int cant){
     int exist = p->exist;
     while (cant != 0){
         p->exist = exist - cant;
@@ -210,7 +210,7 @@ void restar_lote(lote*p, int cant){
             cant = 0;
     }
 }
-
+*/
 void agregarcliente(cliente **p,int x){
     cliente *aux=new cliente;
     cliente *t=*p;
@@ -251,6 +251,16 @@ void mostrarcliente(cliente **t){
     while(o){
         printf("[%li]->",o->ci);
         o=o->sig;
+    }
+    printf("NULL \n\n");
+}
+
+void mostrara(factura *t){
+    factura *o = t;
+    printf("\n\t copia-> ");
+    while(o){
+        printf("[%i]->",o->numfactura);
+        o=o->aba;
     }
     printf("NULL \n\n");
 }
@@ -519,7 +529,7 @@ void venta(cliente *t, productos *p){
                         printf("\tIntroducir fecha:\n");
                         fecha(&dia,&mes,&anno);
                         insertarDetalle(bc, bp,cant, dia, mes, anno, numfac,bp->desc);
-                        restar_lote(p->aba, cant);
+                      //  restar_lote(p->aba, cant);
                         //actualizar fecha.
                         //actualizar precio.
                     }
@@ -636,6 +646,74 @@ void consultarventasproducliente(cliente *t, int cod, long int ci){
     }
 }
 
+void imprimirenoreden(cliente *t,factura *as){
+	factura *aux=as, *tre=as;
+	int x=buscarnumfactura(t);
+	while (x){
+	  while (aux){
+		  if (aux->numfactura==x){
+			 mostrarfactura(aux,aux->codproduc);
+		     aux=aux->aba;
+		  }
+		  else 
+			 aux=aux->aba;
+	  }
+	x--;
+	aux=as;
+	}
+}
+
+
+factura *crearpopaux(factura *tem){
+	factura *pop=new factura;
+	pop->anno=tem->anno;
+	pop->dia=tem->dia;
+	pop->mes=tem->mes;
+	pop->cantvendido=tem->cantvendido;
+	pop->codproduc=tem->codproduc;
+	pop->numfactura=tem->numfactura;
+	pop->numlote=tem->numlote;
+	pop->precio=tem->precio;
+	pop->total=tem->total;
+	strcpy(pop->desc, tem->desc);
+	return pop;
+}
+
+void consultarventassinfecha(cliente *t, int cod){
+	cliente *aux=t;
+	factura *tem=t->aba;
+	factura *yu=NULL;
+	factura *yuaux=NULL;
+	factura *as=NULL;
+	while (aux){
+		while (tem){
+			if (tem->codproduc==cod){
+				as=crearpopaux(tem);
+				if (!yu){
+		            yu=as;
+	                yu->aba=NULL;
+	            }
+	            else {
+		            yuaux=yu;
+		            while (yuaux->aba)
+			           yuaux=yuaux->aba;
+		            yuaux->aba=as;
+					yuaux=yuaux->aba;
+				}
+			    tem=tem->aba;
+			}
+			else
+				tem=tem->aba;
+		}
+		aux=aux->sig;
+		if (aux)
+			tem=aux->aba;
+	}
+	yuaux->aba=NULL;
+	mostrara(yu);
+	imprimirenoreden(t,yu);
+}
+
 void menufecha(cliente *t, int cod){
     int op=-1, dia,mes,anno,dia1,mes1,anno1;
     system("cls");
@@ -644,9 +722,9 @@ void menufecha(cliente *t, int cod){
         printf("\t1.SI. \n ");
         printf("\t2.NO. \n ");
         printf("\t0. Salir al menu Consultas.\n\n");
-        
-        printf("\t"); scanf("%i",&op);
-        
+
+		printf("\t"); scanf("%i",&op);
+
         switch(op){
             case 1: printf("\tPrimera Fecha(inicial): \n");
                 printf("\tIntroduzca Dia/Mes/Año : \n");
@@ -672,8 +750,9 @@ void menufecha(cliente *t, int cod){
                 }while(anno1<=1000);
                 consultarporfecha(t,dia,mes,anno,dia1,mes1,anno1,cod);
                 break;
-            case 2:
-                break;
+
+            case 2: consultarventassinfecha(t,cod);
+                    break;
         }
         
         system("pause");
@@ -1029,4 +1108,3 @@ int main(){
     }
     return 1;
 }
-
