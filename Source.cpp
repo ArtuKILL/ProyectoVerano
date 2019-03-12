@@ -553,7 +553,7 @@ void venta(cliente *t, productos **p){
                         //actualizar fecha.
                         //actualizar precio.
                     }
-                case 0: total = calcular_total(bc,numfac,cant);
+                case 0: total = calcular_total(bc,numfac);
                     factura*tt=bc->aba;
                     while (tt){
                         if (tt->numfactura==numfac)
