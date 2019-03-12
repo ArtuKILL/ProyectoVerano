@@ -1,3 +1,4 @@
+
 // Iliana Dias C.I:26.819.056
 // Arturo Lecuona C.I: 27.588.221
 //Proyecto de Algoritmos y Proramacion 2 VERANO
@@ -37,7 +38,7 @@ struct factura{
     int codproduc;
     long int total;
     char desc[21];
-    int numlote;
+    int codfac;
     int precio;
     factura *aba;
 };
@@ -318,7 +319,7 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
                     if (tt){
                         tt->aba = crearL(dia,mes,anno,cant,precio,codlote,exist);
                         tt->aba->numlot = contarl(tt->aba);
-					}
+                    }
                     else{
                         t->aba = crearL(dia,mes,anno,cant,precio,codlote,exist);
                         t->aba->numlot = 1;
@@ -399,16 +400,17 @@ cliente *buscarCliente(cliente *t, long int ci){ //--
 }
 
 int calculo_precio(int cant, int precio){
-	int y;
-	y=((precio*30)/100)+precio;
+    int y;
+    y=((precio*30)/100)+precio;
     return cant*y;
 }
 
-void insertarDetalle(cliente *t, productos *p,int cant,int dia, int mes, int anno,int numfac, char desc[20]){ // t parado en cliente y p en el prducto que quiere comprar
+void insertarDetalle(cliente *t, productos *p,int cant,int dia, int mes, int anno,int numfac, char desc[20],int codfac){ // t parado en cliente y p en el prducto que quiere comprar
     if(p->aba){
         factura* nuevo = new factura;
         nuevo->cantvendido = cant;
         nuevo->numfactura = numfac;
+        nuevo->codfac = codfac;
         strcpy(nuevo->desc, desc);
         nuevo->dia = dia;
         nuevo->mes = mes;
@@ -466,6 +468,7 @@ void mostrarF(cliente*p){
                 nf = t->numfactura;
                 printf("\tFecha: %i/%i/%i\n ",t->dia,t->mes,t->anno%100);
                 printf("\tFactura[%i]\n",t->numfactura);
+                printf("\tNumero de factura[%i]\n",t->codfac);
                 f=0;
             }
             printf("\tProducto:[%i][%s]\n",t->codproduc,t->desc);
@@ -505,7 +508,7 @@ int calcular_total(cliente *t,int numfac){
     factura *p =t->aba;
     while(p){
         if (p->numfactura==numfac)
-			total+=p->precio;
+            total+=p->precio;
         p= p->aba;
     }
     return total;
@@ -514,7 +517,7 @@ int calcular_total(cliente *t,int numfac){
 
 void venta(cliente *t, productos **p){
     long int ci;
-    int numfac,op=-1,f=0,cant=existenciaP(*p)+1,dia,mes,anno,cod,total=0;
+    int numfac,op=-1,f=0,cant=existenciaP(*p)+1,dia,mes,anno,cod,total=0,codfac =0;
     cliente *bc;
     productos *bp;
     printf("\tCodigo de cliente:\n");
@@ -522,6 +525,8 @@ void venta(cliente *t, productos **p){
     bc = buscarCliente(t, ci);
     if (bc){
         numfac = buscarnumfactura(t) + 1;
+        printf("\tInserte codigo de factura: \n");
+        scanf("%i",&codfac);
         while (op){
             printf("\t\tFACTURA: \n");
             printf("\t1.Agregar Producto a factura.\n");
@@ -543,11 +548,13 @@ void venta(cliente *t, productos **p){
                             f=1;
                         }
                         f=0;
+                        
                         printf("\tIntroducir fecha:\n");
                         fecha(&dia,&mes,&anno);
                         
+                        
                         if(existenciaP(bp) > 0){
-                            insertarDetalle(bc, bp,cant, dia, mes, anno, numfac,bp->desc); //agregar cod lote si se borran los lotes vacios..
+                            insertarDetalle(bc, bp,cant, dia, mes, anno, numfac,bp->desc,codfac); //agregar cod lote si se borran los lotes vacios..
                             restar_lote((bp->aba), cant);
                         }
                         //actualizar fecha.
@@ -716,7 +723,7 @@ factura *crearpopaux(factura *tem){ //--
     pop->cantvendido=tem->cantvendido;
     pop->codproduc=tem->codproduc;
     pop->numfactura=tem->numfactura;
-    pop->numlote=tem->numlote;
+    pop->codfac=tem->codfac;
     pop->precio=tem->precio;
     pop->total=tem->total;
     strcpy(pop->desc, tem->desc);
@@ -1109,7 +1116,7 @@ void menuProductos(productos **p,cliente *t){
 int guardarP(productos *p){
     FILE *apun;
     
-    apun = fopen("cargar\cargarP.txt", "w");
+    apun = fopen("cargarP.txt", "w");
     lote *t;
     if (apun){
         while(p){
@@ -1143,7 +1150,7 @@ int guardarP(productos *p){
 int guardarC(cliente *p){
     FILE *apun;
     
-    apun = fopen("cargar\cargarC.txt", "w"); //Cambiar ruta...
+    apun = fopen("cargarC.txt", "w"); //Cambiar ruta...
     factura *t;
     if (apun){
         while(p){
@@ -1154,7 +1161,7 @@ int guardarC(cliente *p){
             else
                 fprintf(apun,"-1");
             while(t){
-                fprintf(apun,"%i\n%i\n%i\n%i\n%i\n%i\n%i\n%li\n%i\n%s\n",t->dia,t->mes,t->anno,t->numfactura,t->cantvendido,t->numlote,t->precio,t->total,t->codproduc,t->desc);
+                fprintf(apun,"%i\n%i\n%i\n%i\n%i\n%i\n%i\n%li\n%i\n%s\n",t->dia,t->mes,t->anno,t->numfactura,t->cantvendido,t->codfac,t->precio,t->total,t->codproduc,t->desc);
                 t=t->aba;
                 if(t)
                     fprintf(apun, "0\n");
@@ -1199,7 +1206,7 @@ int CargarC(cliente **q){
     FILE *apun;
     char buffer[100];
     int ctrl = 0;
-    apun = fopen("cargar\cargarC.txt", "r");//    char ruta[]; scanf("%s",&ruta);       fopen(ruta, "r");
+    apun = fopen("cargarC.txt", "r");//    char ruta[]; scanf("%s",&ruta);       fopen(ruta, "r");
     if (apun){
         borrarclientes(&*q);
         fscanf(apun, "\n");
@@ -1235,11 +1242,11 @@ int CargarC(cliente **q){
                     fgets(buffer, 100, apun);
                     tt->cantvendido = atoi(buffer);
                     fgets(buffer, 100, apun);
-                    tt->numlote = atoi(buffer);
+                    tt->codfac = atoi(buffer);
                     fgets(buffer, 100, apun);
                     tt->precio = atoi(buffer);
                     fgets(buffer, 100, apun);
-                    tt->total = atol(buffer); 
+                    tt->total = atol(buffer);
                     fgets(buffer,100,apun);
                     tt->codproduc = atoi(buffer);
                     fgets(buffer, 100, apun);
@@ -1256,7 +1263,7 @@ int CargarC(cliente **q){
             fscanf(apun,"\n");
         }
         fscanf(apun,"\n");
-		fclose(apun);
+        fclose(apun);
     }
     return 0;
 }
@@ -1267,7 +1274,7 @@ int CargarP(productos **q){
     int val;
     char buffer[100];
     int ctrl = 0;
-    apun = fopen("cargar\cargarP.txt", "r");
+    apun = fopen("cargarP.txt", "r");
     if (apun){
         borrarproductos(&*q);
         fscanf(apun, "\n");
@@ -1330,7 +1337,7 @@ int CargarP(productos **q){
             fscanf(apun,"\n");
         }
         fscanf(apun,"\n");
-		fclose(apun);
+        fclose(apun);
     }
     return 0;
 }
@@ -1366,7 +1373,7 @@ void cargar(productos **p, cliente**q){
 }
 
 int main(){
-
+    
     int op=-1; productos *p = NULL;
     cliente *t= NULL;
     cargar(&p,&t);
@@ -1382,7 +1389,7 @@ int main(){
         
         printf("\t"); scanf("%i",&op);
         
-		switch(op){
+        switch(op){
             case 1: menuProductos(&p,t);
                 break;
             case 2: menuClientes(&t);
@@ -1401,3 +1408,4 @@ int main(){
     }
     return 1;
 }
+
