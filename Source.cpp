@@ -1,10 +1,11 @@
-// Iliana Dias C.I:26.819.056
+// Iliana Dias C.I:
 // Arturo Lecuona C.I: 27.588.221
 //Proyecto de Algoritmos y Proramacion 2 VERANO
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctime>
+#include <ctype.h>
 
 
 struct lote{
@@ -18,6 +19,12 @@ struct lote{
     int codlote;
     lote *aba;
 };
+
+/*struct xramo{
+    int cod;
+    char ramo[10];
+    xramo *sig;
+}; */
 
 
 struct productos{
@@ -82,7 +89,7 @@ int codRep(productos *p,int x){ //Arroja 1 si hay un codigo rep, 0 si no hay.
 
 void agregarProductos(productos **p){
     int cod,f=0; char desc[21],ramo[11];    //tp1
-    printf("\n\tCodigo del Producto\n ");
+    printf("\n\tCodigo del producto\n ");
     do{
         if(f) printf("\tCodigo en uso...\n");
         printf("\tCodigo->");
@@ -90,9 +97,9 @@ void agregarProductos(productos **p){
         f=1;
     }while(codRep(*p, cod));
     printf(" \n");
-    printf("\tDescripcion del Producto:\n");
+    printf("\tNombre del producto.(descripcion):\n");
     printf("\t"); scanf("\n"); gets(desc);  //scanf("%s",&desc); printf(" \n");
-    printf("\n\tRamo del Producto:\n ");
+    printf("\n\tRamo del producto:\n ");
     printf("\t"); scanf("\n"); gets(ramo);  //scanf("%s",&ramo); printf(" \n");
    
     
@@ -100,12 +107,12 @@ void agregarProductos(productos **p){
 }
 
 void mostrarproductos(productos *p){ //Muestra los productos con su CODIGO,DESCRIPCION,RAMO.
-    printf(" \tProductos-> ");
+    printf(" CAB-> ");
     while(p){
         printf("[%i,%s,%s]->",p->codigo,p->desc,p->ramo);
         p=p->sig;
     }
-    printf(" NULL \n\n");
+    printf(" NULL \n");
 }
 
 void mostrarSub(productos *p){ //Muestra la sub lista de un producto (p apunta al producto)
@@ -184,7 +191,7 @@ void consultapornombre(productos *p, char produc1[]){ //--
         printf(" no esta registrado \n\n");
     }
 }
-void restar_lote(lote*p, int cant){ //en pruebas
+void restar_lote(lote*p, int cant){ //resta
     if(p){
         int exist = p->exist;
         
@@ -259,13 +266,13 @@ void mostrara(factura *t){ //--
 
 
 
-lote *crearL(int dia,int mes, int anno,int cant, int precio,int codlote){ //crea un lote (solo para insertar por cola)
+lote *crearL(int dia,int mes, int anno,int cant, int precio,int codlote,int exist){ //crea un lote (solo para insertar por cola)
     lote* t = new lote;
     t->dia = dia;
     t->mes = mes;
     t->anno = anno;
     t->cant = cant;
-    t->exist = cant;
+    t->exist = exist;
     t->precio = precio;
     t->codlote = codlote;
     t->aba = NULL;
@@ -284,35 +291,42 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
     tm *info;
     time(&tiemp);
     info = localtime(&tiemp);
-    int dia=info->tm_mday,mes=info->tm_mon+1,anno=info->tm_year%100,cant=0,precio=0,op=-1,codlote = 0;
+    int dia=info->tm_mday,mes=info->tm_mon+1,anno=info->tm_year%100,cant=0,precio=0,exist = 0,op=-1,codlote = 0;
     productos* t = buscarProducto(p,cod);
     
     if (t){
         lote* tt= t->aba;
         while (op){
-            printf("\tInsertar fecha: \n");
+            printf("\t\tAGREGAR EXISTENCIA. \n\n");
             printf("\t1.Fecha de hoy. (Automatico).\n");
             printf("\t2.Establecer fecha (Manual).\n\n");
+            printf("\t0. Salir a menu PRODUCTOS.\n\n");
             
-            printf("\t"); scanf("%i",&op); printf("\n");
+            scanf("%i",&op);
             
             switch (op) {
                 case 1:
-                    printf("\tIntroduzca cantidad del lote de %s: \n\t",t->desc);
-                    scanf("%i",&cant);
-                    printf("\tIntroduzca precio del lote de %s: \n\t",t->desc);
-                    scanf("%i",&precio);
-                    printf("\tIntroduzca numero del lote de %s:\n\t",t->desc);
-                    scanf("%i",&codlote);
+                    printf("\n\tIntroduzca cantidad del lote: \n");
+                    do{
+                        printf("\tCantidad-> "); scanf("%i",&cant);
+                    }while(cant <= 0);
+                    printf("\n\tIntroduzca existencia del lote: \n");
+                    do{
+                        printf("\tExistencia-> "); scanf("%i",&exist);
+                    }while (exist<=0 || exist>cant );
+                    printf("\tIntroduzca precio del lote: \n");
+                    do{
+                        printf("\tPrecio-> "); scanf("%i",&precio);
+                    }while (precio <= 0);
                     
                     while (tt && tt->aba)
                         tt= tt->aba;
                     if (tt){
-                        tt->aba = crearL(dia,mes,anno,cant,precio,codlote);
+                        tt->aba = crearL(dia,mes,anno,cant,precio,codlote,exist);
                         tt->aba->numlot = contarl(p->aba);
                     }
                     else{
-                        t->aba = crearL(dia,mes,anno,cant,precio,codlote);
+                        t->aba = crearL(dia,mes,anno,cant,precio,codlote,exist);
                         t->aba->numlot = 1;
                     }
                     break;
@@ -327,22 +341,27 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
                     }while(mes<=0 || mes>=13);
                     do{
                         printf("\tAnno-> "); scanf("%i",&anno);
-                    }while(anno<=0 || anno>99);
-                    printf("\n\tIntroduzca cantidad del lote: \n\t");
-                    scanf("%i",&cant);
+                    }while(anno<0 || anno>99);
+                        printf("\n\tIntroduzca cantidad del lote: \n\t");
+                    do{
+                        printf("\tCantidad-> "); scanf("%i",&cant);
+                    }while(cant <= 0);
+                    printf("\n\tIntroduzca existencia del lote: \n\t");
+                    do{
+                        printf("\tExistencia-> "); scanf("%i",&exist);
+                    }while (exist<=0 || exist>cant );
                     printf("\tIntroduzca precio del lote: \n\t");
-                    scanf("%i",&precio);
-					printf("\tIntroduzca numero del lote de %s:\n\t",t->desc);
-                    scanf("%i",&codlote);
-
+                    do{
+                        printf("\tPrecio-> "); scanf("%i",&precio);
+                    }while (precio <= 0);
                     while (tt && tt->aba)
                         tt= tt->aba;
                     if (tt){
-                        tt->aba = crearL(dia,mes,anno,cant,precio,codlote);
+                        tt->aba = crearL(dia,mes,anno,cant,precio,codlote,exist);
                         tt->aba->numlot = contarl(p->aba);
                     }
                     else{
-                        t->aba = crearL(dia,mes,anno,cant,precio,codlote);
+                        t->aba = crearL(dia,mes,anno,cant,precio,codlote,exist);
                         t->aba->numlot = 1;
                     }
                     break;
@@ -353,7 +372,7 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
         }
     }
     else
-        printf("\tProducto no encontrado... (Codigo errado)\n\n ");
+        printf("\tProducto no encontrado... (Codigo errado) \n ");
     
 }
 
@@ -424,19 +443,19 @@ void fecha(int *dia,int *mes, int *anno){
     printf("\t1.Fecha de hoy. (Automatico).\n");
     printf("\t2.Establecer fecha. (Manual).\n\n");
     
-    printf("\t"); scanf("%i",&op); printf("\n");
-
+    scanf("%i",&op);
     switch (op) {
-        case 1: *dia=info->tm_mday;
-				*mes=info->tm_mon+1;
-				*anno=info->tm_year;
-				break;
+        case 1:
+            *dia=info->tm_mday;
+            *mes=info->tm_mon+1;
+            *anno=info->tm_year%100;
+            break;
             
-        case 2: printf("\tIntroduzca Dia/Mes/Anno : \n");
-				printf("\tDia->");scanf("%i",dia);
-				printf("\tMes->");scanf("%i",mes);
-				printf("\tAnno->");scanf("%i",anno); printf("\n");
-				break;
+        case 2:
+            printf("Dia->");scanf("%i",dia);
+            printf("Mes->");scanf("%i",mes);
+            printf("Año->");scanf("%i",anno);
+            break;
     }
 }
 void mostrarF(cliente*p){
@@ -465,7 +484,7 @@ void mostrarF(cliente*p){
     }
 }
 
-int buscarnumfactura(cliente *t){ 
+int buscarnumfactura(cliente *t){ //--
     int x=0;
     cliente *aux=t;
     factura *b=t->aba;
@@ -484,53 +503,45 @@ int buscarnumfactura(cliente *t){
     return x;
 }
 
-int ganancia(int pre){
-	int x=0;
-	x=(pre*30)/100;
-	return x;
-}
-
-int calcular_total(cliente *t,int numfac, int cant){
-    int total=0, x;
-    factura *p =t->aba;
-	x=ganancia(p->precio);
+int calcular_total(cliente *t,int numfac){
+    int total=0;
+    factura*p = t->aba;
     while(p){
         if (p->numfactura==numfac)
-            total= (x*cant)+total;
+            total += p->precio;
         p= p->aba;
     }
     return total;
 }
 
 
-void venta(cliente *t, productos **p){
+void venta(cliente *t, productos **p){ //ventax
     long int ci;
     int numfac,op=-1,f=0,cant=existenciaP(*p)+1,dia,mes,anno,cod,total=0;
     cliente *bc;
     productos *bp;
     printf("\tCodigo de cliente:\n");
-    printf("\t");scanf("%li",&ci); printf("\n");
+    scanf("%li",&ci);
     bc = buscarCliente(t, ci);
     if (bc){
         numfac = buscarnumfactura(t) + 1;
         while (op){
-			printf("\t\tFACTURA: \n");
             printf("\t1.Agregar Producto a factura.\n");
-            printf("\t0.Terminar Factura (Vender).\n\n");
+            printf("\t0.Vender.\n\n");
             
-            printf("\t"); scanf("%i",&op); printf("\n");
+            scanf("%i",&op);
             
             switch (op) {
                 case 1:
                     printf("\tInsertar codigo del producto a vender: \n");
-                    printf("\t"); scanf("%i",&cod);
+                    scanf("%i",&cod);
                     bp = buscarProducto(*p, cod);
                     if(bp){
                         cant=existenciaP(bp)+1;
                         printf("\tInsertar cantidad a vender de %s\n",bp->desc);
                         while(cant > existenciaP(bp)){
                             if (f) printf("\t Cantidad a vender superior a la existente-> %i\n",existenciaP(bp));
-                            printf("\t"); scanf("%i",&cant); printf("\n");
+                            scanf("%i",&cant);
                             f=1;
                         }
                         f=0;
@@ -544,14 +555,18 @@ void venta(cliente *t, productos **p){
                         //actualizar fecha.
                         //actualizar precio.
                     }
-                case 0: total = calcular_total(bc,numfac,cant);
-						factura*tt=bc->aba;
-						while (tt){
-							if (tt->numfactura==numfac)
-								tt->total = total;
-							tt=tt->aba;
-						}
-						break;
+                    
+                    
+                    
+                case 0:
+                    total = calcular_total(t,numfac);
+                    factura*tt = t->aba;
+                    while (tt){
+                        if(tt->numfactura==numfac)
+                            tt->total = total;
+                        tt=tt->aba;
+                    }
+                    break;
             }
         }
     }
@@ -581,13 +596,14 @@ void elimSubC(factura **q){
 
 
 
-void elimProducto(productos**p,int cod){
+int elimProducto(productos**p,int cod){
     productos* t = buscarProducto(*p, cod);
     if (t){
         if (t->codigo == (*p)->codigo){
             (*p)=(*p)->sig;
             elimSub(&(t->aba));
             delete t;
+            return 1;
         }
         else {
             productos *aux = *p;
@@ -595,38 +611,15 @@ void elimProducto(productos**p,int cod){
                 aux = aux->sig;
             aux->sig = aux->sig->sig;
             delete t;
+            return 1;
         }
     }
+    return 0;
 }
 
-void elimfacturaproduct(cliente *t, int cod){
-	cliente *ka=t;
-	factura *aux=NULL;
-	factura *temp=NULL;
-	while (ka){
-		while ((ka->aba) && (ka->aba->codproduc==cod)){
-			temp=ka->aba;
-			ka->aba=temp->aba;
-			delete temp;
-			factura *temp=NULL;
-		}
-		aux=ka->aba;
-		while (aux){
-			if ((aux->aba)&&(aux->aba->codproduc==cod)){
-				temp=aux->aba;
-				aux->aba=temp->aba;
-				delete temp;
-				factura *temp=NULL;
-			}
-			else
-				aux=aux->aba;
-		}
-		ka=ka->sig;
-	}
-}
-
-void mostrarfactura(factura *q, int cod){
+void mostrarfactura(factura *q, int cod){ //--
     int nf=0,f=1;
+    while(q){
         if (q->codproduc==cod){
             printf("\t-------------------------\n");
             if(f){
@@ -644,45 +637,52 @@ void mostrarfactura(factura *q, int cod){
             if (q && q->numfactura != nf)
                 f=1;
         }
+        else
+            break;
+    }
 }
-
-
-void consultarventasproducliente(cliente *t, int cod, long int ci){
+void consultarporfecha(cliente *t, int dia, int mes, int anno, int dia1, int mes1, int anno1, int cod){ //--
     cliente *aux=t;
-    factura *tem=t->aba, *rep=t->aba;
-    mostrara(tem);
-    while ((aux) && (aux->ci!=ci))
+    factura *ter=t->aba;
+    while (aux){
+        while (ter){
+            if (ter->codproduc==cod){
+                if ((ter->dia>=dia) && (ter->mes>=mes) && (ter->anno>=anno)){
+                    if ((ter->dia<=dia1) && (ter->mes<=mes1) && (ter->anno<=anno1)){
+                        mostrarfactura(ter,cod);
+                    }
+                    else
+                        ter=ter->aba;
+                }
+                else
+                    ter=ter->aba;
+            }
+            else
+                ter=ter->aba;
+        }
         aux=aux->sig;
-	if (!aux)
-		printf("\tEl cliente NO existe\n ");
-	if (aux){
-		tem=aux->aba;
-		rep=aux->aba;
-		if (tem){
-			while (tem->aba)
-				tem=tem->aba;
-			while (tem!=aux->aba){
-				while (rep->aba!=tem)
-					rep=rep->aba;
-				if (tem->codproduc==cod){
-					mostrarfactura(tem,cod);
-					tem=rep;
-					rep=aux->aba;
-				}
-				else{
-					tem=rep;
-					rep=aux->aba;
-				}
-			}
-			if ((tem==aux->aba) && (aux->aba->codproduc==cod))
-				mostrarfactura(tem,cod);
-		}
-		else 
-			printf("\tEl cliente NO posee Facturas\n "); 
-	}
+        if (aux)
+            ter=aux->aba;
+    }
 }
 
-void imprimirenorden(cliente *t,factura *as){ //--
+void consultarventasproducliente(cliente *t, int cod, long int ci){ //--
+    cliente *aux=t;
+    factura *tem=t->aba;
+    while (aux->ci!=ci)
+        aux=aux->sig;
+    tem=aux->aba;
+    while (tem){
+        if (tem->codproduc==cod){
+            mostrarfactura(tem,cod);
+            tem=tem->aba;
+        }
+        else
+            tem=tem->aba;
+    }
+}
+
+void imprimirenoreden(cliente *t,factura *as){ //--
     factura *aux=as;
     int x=buscarnumfactura(t);
     while (x){
@@ -699,6 +699,8 @@ void imprimirenorden(cliente *t,factura *as){ //--
     }
 }
 
+
+
 factura *crearpopaux(factura *tem){ //--
     factura *pop=new factura;
     pop->anno=tem->anno;
@@ -714,7 +716,7 @@ factura *crearpopaux(factura *tem){ //--
     return pop;
 }
 
-void consultarventassinfecha(cliente *t, int cod){
+void consultarventassinfecha(cliente *t, int cod){ //--
     cliente *aux=t;
     factura *tem=t->aba;
     factura *yu=NULL;
@@ -731,7 +733,7 @@ void consultarventassinfecha(cliente *t, int cod){
                 else {
                     yuaux=yu;
                     while (yuaux->aba)
-                       yuaux=yuaux->aba;
+                        yuaux=yuaux->aba;
                     yuaux->aba=as;
                     yuaux=yuaux->aba;
                 }
@@ -744,49 +746,13 @@ void consultarventassinfecha(cliente *t, int cod){
         if (aux)
             tem=aux->aba;
     }
-	if (yuaux)
-		yuaux->aba=NULL;
-    imprimirenorden(t,yu);
+    yuaux->aba=NULL;
+    mostrara(yu);
+    imprimirenoreden(t,yu);
 }
 
-void consultarporfecha(cliente *t, int dia, int mes, int anno, int dia1, int mes1, int anno1, int cod){
-    cliente *aux=t;
-    factura *tem=t->aba;
-    factura *yu=NULL;
-    factura *yuaux=NULL;
-    factura *as=NULL;
-    while (aux){
-        while (tem){
-            if (((tem->dia>=dia) && (tem->mes>=mes) && (tem->anno>=anno)) && ((tem->dia<=dia1) && (tem->mes<=mes1) && (tem->anno<=anno1))){
-            if (tem->codproduc==cod){
-                as=crearpopaux(tem);
-                if (!yu){
-                    yu=as;
-                    yu->aba=NULL;
-                }
-                else {
-                    yuaux=yu;
-                    while (yuaux->aba)
-                       yuaux=yuaux->aba;
-                    yuaux->aba=as;
-                    yuaux=yuaux->aba;
-                }
-                tem=tem->aba;
-            }
-            }
-            else
-                tem=tem->aba;
-        }
-        aux=aux->sig;
-        if (aux)
-            tem=aux->aba;
-    }
-	if (yuaux)
-		yuaux->aba=NULL;
-    imprimirenorden(t,yu);
-}
 
-void menufecha(cliente *t, int cod){
+void menufecha(cliente *t, int cod){ //--
     int op=-1, dia,mes,anno,dia1,mes1,anno1;
     system("cls");
     while (op){
@@ -794,101 +760,72 @@ void menufecha(cliente *t, int cod){
         printf("\t1.SI. \n ");
         printf("\t2.NO. \n ");
         printf("\t0. Salir al menu Consultas.\n\n");
-
-        printf("\t"); scanf("%i",&op); printf("\n");
-
+        
+        printf("\t"); scanf("%i",&op);
+        
         switch(op){
             case 1: printf("\tPrimera Fecha(inicial): \n");
-					printf("\tIntroduzca Dia/Mes/Año : \n");
-					do{
-						printf("\tDia-> "); scanf("%i",&dia);
-					} while (dia<0 || dia>32);
-					do{
-						printf("\tMes-> "); scanf("%i",&mes);
-					} while (mes<0 || mes>13);
-					do{
-						printf("\tAnno-> "); scanf("%i",&anno);
-					} while (anno<=1000);
-					printf("\n\tSegunda Fecha(final): \n");
-					printf("\tIntroduzca Dia/Mes/Año : \n");
-					do{
-						printf("\tDia-> "); scanf("%i",&dia1);
-					} while (dia<0 || dia>32);
-					do{
-						printf("\tMes-> "); scanf("%i",&mes1);
-					} while (mes<0 || mes>13);
-					do{
-						printf("\tAnno-> "); scanf("%i",&anno1);
-					} while (anno1<=1000);
-					consultarporfecha(t,dia,mes,anno,dia1,mes1,anno1,cod); printf("\n");
-					break;
-
-            case 2: consultarventassinfecha(t,cod); printf("\n");
-                    break;
+                printf("\tIntroduzca Dia/Mes/Año : \n");
+                do{
+                    printf("\tDia-> "); scanf("%i",&dia);
+                }while (dia<=0 || dia>=32);
+                do{
+                    printf("\tMes-> "); scanf("%i",&mes);
+                }while(mes<=0 || mes>=13);
+                do{
+                    printf("\tAño-> "); scanf("%i",&anno);
+                }while(anno<=1000);
+                printf("\n\tSegunda Fecha(final): \n");
+                printf("\tIntroduzca Dia/Mes/Año : \n");
+                do{
+                    printf("\tDia-> "); scanf("%i",&dia1);
+                }while (dia<=0 || dia>=32);
+                do{
+                    printf("\tMes-> "); scanf("%i",&mes1);
+                }while(mes<=0 || mes>=13);
+                do{
+                    printf("\tAño-> "); scanf("%i",&anno1);
+                }while(anno1<=1000);
+                consultarporfecha(t,dia,mes,anno,dia1,mes1,anno1,cod);
+                break;
+            case 2: consultarventassinfecha(t,cod);
+                break;
         }
+        
         system("pause");
-		system("cls");
     }
 }
 
-cliente *crearclientef(cliente *re){
-	cliente *wen=new cliente;
-	wen->ci=0;
-	wen->sig=NULL;
-	wen->aba=NULL;
-	return wen;
-}
-
-void insertarfactclientef(cliente **t, factura *we){ /*adjunta las facturas al cliente fantasma*/ //--
-	cliente *re=(*t)->sig;
-	factura *pew=(*t)->aba;
-	while (re->sig){
-		if (re->ci==0)
-			break;
+void insertarfactclientef(cliente **t, cliente *auxt, factura *we, factura *w){ /*adjunta las facturas al cliente fantasma*/ //--
+    cliente *re=auxt->sig;
+    while (re->sig)
         re=re->sig;
-	}
-	if (re->ci!=0){
-		re->sig=crearclientef(re);
-		re=re->sig;
-	}
     if (re->aba){
-		pew=re->aba;
-		while (pew->aba)
-			pew=pew->aba;
-        pew->aba=we;
+        we=re->aba;
+        while (we->aba)
+            we=we->aba;
+        we->aba=w;
     }
     else
-        re->aba=we;
+        re->aba=w;
 }
 
-
-
-void eliminarcliente(cliente **t, int ci){
-    cliente *auxt=*t;
+void eliminarcliente(cliente **t, int ci){ //--
+    cliente *auxt=(*t);
     factura *w=auxt->sig->aba, *we=NULL;
     cliente *te=auxt->sig;
     while (auxt && auxt->sig){
         if (auxt->sig->ci==ci){
-			if (w)
-                insertarfactclientef(t,w);
             te=auxt->sig;
-			w=auxt->sig->aba;
             auxt->sig=te->sig;
             delete te;
+            if (w)
+                insertarfactclientef(t,auxt,we,w);
             cliente *te=auxt->sig;
-			if (auxt->aba)
-				w=te->aba;
         }
         else
             auxt=auxt->sig;
     }
-	if ((*t)->ci==ci){
-		if ((*t)->aba)
-			insertarfactclientef(t,(*t)->aba);
-		te=*t;
-		*t=(*t)->sig;
-		delete te;
-	}	
 }
 
 
@@ -906,19 +843,19 @@ void menuClientes(cliente **t){ //--
         
         switch(op){
             case 1: printf(" \n"); printf("\tIngrese el Codigo de Cliente que desea Agregar \n ");
-					printf("\t"); scanf("%i",&x); printf("\n ");
-					agregarcliente(t,x);
-					break;
+                printf("\t"); scanf("%i",&x); printf("\n ");
+                agregarcliente(t,x);
+                break;
             case 2: printf(" \n"); printf("\tIngrese el Codigo de Cliente que desea Consultar \n ");
-					printf("\t"); scanf("%i",&x);
-					consultarcliente(t,x);
-					break;
+                printf("\t"); scanf("%i",&x); printf("\n ");
+                consultarcliente(t,x);
+                break;
             case 3: printf(" \n"); printf("\tIngrese el Codigo de Cliente que desea Eliminar \n ");
-					printf("\t"); scanf("%i",&x); printf("\n ");
-					eliminarcliente(t,x);
-					break;
+                printf("\t"); scanf("%i",&x); printf("\n ");
+                eliminarcliente(t,x);
+                break;
             case 4: mostrarcliente(t);
-					break;
+                break;
         }
         
         system("pause");
@@ -936,20 +873,21 @@ void menuVentas(productos **p, cliente *t){ //--
         printf("\t2.Consultar venta. \n\n ");
         printf("\t0. Salir al menu principal.\n\n");
         
-        printf("\t"); scanf("%i",&op); printf("\n");
+        printf("\t"); scanf("%i",&op);
         
         switch(op){
             case 1: venta(t, &*p);
-					system("cls");
-					break;
-            case 2: printf("\tInsertar CI:\n\t"); //ver facturas de un cliente
-					scanf("%li",&ci);
-					cliente * xx = buscarCliente(t, ci);
-					mostrarF(xx);
-					break;
+                break;
+            case 2:
+                printf("\tInsertar CI:\n\t"); //ver facturas de un cliente
+                scanf("%li",&ci);
+                cliente * xx = buscarCliente( t, ci);
+                mostrarF(xx);
+                break;
+                
         }
+        
         system("pause");
-		system("cls");
     }
 }
 
@@ -960,7 +898,7 @@ void elimSaltos(char *x){
 void menuConsultas(productos *p, cliente *t){ //--
     int op=-1,cod;
     long int ci;
-    char nom[21]="\0";
+    char nom[20]="\0";
     system("cls");
     while(op){
         printf("\t\tMENU CONSULTAS. \n\n ");
@@ -970,28 +908,28 @@ void menuConsultas(productos *p, cliente *t){ //--
         printf("\t4.Consultar las ventas de un producto para un cliente. \n\n ");
         printf("\t0. Salir al menu principal.\n\n");
         
-        printf("\t"); scanf("%i",&op); printf("\n");
+        printf("\t"); scanf("%i",&op);
         
         switch(op){
             case 1: printf(" \n"); printf("\tIngrese el Producto que desea consultar\n ");
-					printf("\t"); scanf("%s",&nom[20]); printf(" \n");
-					consultapornombre(p,nom);
-					break;
+                printf("\t"); scanf("%s",&nom[20]); printf(" \n");
+                consultapornombre(p,nom);
+                break;
             case 2: printf("\tIngrese el codigo del Producto que desea consultar\n ");
-					/*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
-					printf("\t"); scanf("%i",&cod); printf(" \n");
-					consultarporcodigo(p,cod);
-					break;
+                /*funcion que revise si se encuentra ese codigo, de lo contrario, imprima que no existe"*/
+                printf("\t"); scanf("%i",&cod); printf(" \n");
+                consultarporcodigo(p,cod);
+                break;
             case 3: printf("\tIngrese el Codigo del Producto que desea consultar\n ");
-					printf("\t"); scanf("%i",&cod); printf(" \n");
-					menufecha(t,cod);
-					break;
+                printf("\t"); scanf("%i",&cod); printf(" \n");
+                menufecha(t,cod);
+                break;
             case 4: printf("\tIngrese el Codigo del Producto que desea consultar\n ");
-					printf("\t"); scanf("%i",&cod); printf(" \n");
-					printf("\tIngrese el Codigo del del Cliente que desea consultar\n ");
-					printf("\t"); scanf("%li",&ci); printf(" \n");
-					consultarventasproducliente(t,cod,ci);printf("\n");
-					break;
+                printf("\t"); scanf("%i",&cod); printf(" \n");
+                printf("\tIngrese el Codigo del del Cliente que desea consultar\n ");
+                printf("\t"); scanf("%li",&ci); printf(" \n");
+                consultarventasproducliente(t,cod,ci);
+                break;
         }
         system("pause");
         system("cls");
@@ -1003,46 +941,51 @@ void menuModificar(productos *p,productos *cab){ //recordar que se pasa el apunt
     int op = -1, cod;
     if (p){
         while (op){
-            printf("\t\tMENU MODIFICAR. \n\n");
+            printf("\t\tMENU MODIFICAR.\n\n ");
+            printf("\tProducto: %s\n",p->desc);
             printf("\t1.Cambiar descripcion(nombre).\n ");
             printf("\t2.Cambiar ramo.\n ");
             printf("\t3.Cambiar codigo.\n\n ");
             printf("\t0.Salir al menu de productos..\n\n");
             
-            printf("\t"); scanf("%i",&op); printf("\n");
+            scanf("%i",&op);
             
             switch (op) {
-                case 1: printf("\tDescripcion actual-> %s \n",p->desc);
-						printf("\tDescripcion nueva-> "); scanf("%s",&(p->desc)); printf("\n");
-						break;
+                case 1:
+                    printf("Descripcion actual-> %s \n",p->desc);
+                    printf("Descripcion nueva-> "); scanf("%s",&(p->desc));
+                    break;
                     
-                case 2: printf("\tRamo actual-> %s \n",p->ramo);
-						printf("\tRamo nuevo-> "); scanf("%s",&(p->ramo)); printf("\n");
-						break;
+                case 2:
+                    printf("Ramo actual-> %s \n",p->ramo);
+                    printf("Ramo nuevo-> "); scanf("%s",&(p->ramo));
+                    break;
                     
-                case 3: int f =0; /* el flag es para que no muestre el mensaje de cod rep en la primera
-									iteracion */
-						printf("\tCodigo actual-> %i \n",p->codigo);
-						printf("\tCodigo nuevo-> ");
-						do{
-							if(f) printf("\n\tCodigo repetido... \n");
-							  printf("\t"); scanf("%i",&(cod)); 
-							f = 1;
-						} while(codRep(cab,cod));
-						p->codigo = cod; printf("\n");
-						break;
+                case 3:
+                    int f =0; /* el flag es para que no muestre el mensaje de cod rep en la primera
+                               iteracion */
+                    printf("Codigo actual-> %i \n",p->codigo);
+                    do{
+                        if(f) printf("Codigo repetido... \n");
+                        scanf("%i",&(cod));
+                        f = 1;
+                    }while(codRep(cab,cod));
+                    p->codigo = cod;
+                    break;
             }
+            
+            
             system("pause");
             system("cls");
         }
     }
-    else printf("\n\tProducto no encontrado (codigo errado)... \n\n");
+    else printf("Producto no encontrado (codigo errado)... \n");
 }
 
 
-void menuProductos(productos **p,cliente *t){
-    int op=-1, cod; 
-	productos * xx = NULL;
+void menuProductos(productos **p){
+    int op=-1, cod; productos * xx = NULL;
+    
     system("cls");
     while(op){
         printf("\t\tMENU PRODUCTOS. \n\n ");
@@ -1056,45 +999,48 @@ void menuProductos(productos **p,cliente *t){
         printf("\t0. Salir al menu principal.\n\n");
         
         
-        printf("\t"); scanf("%i",&op); printf(" \n");
+        printf("\t"); scanf("%i",&op);
         
         switch(op){
-            case 1: agregarProductos(&*p); printf(" \n");
-					break;
+            case 1: printf(" \n"); agregarProductos(&*p);
+                break;
             case 2: printf("\tIndique el codigo del producto: \n\t");
-					scanf("%i",&cod); printf(" \n");
-					insertarL(*p, cod);
-					break;
+                scanf("%i",&cod);
+                insertarL(*p, cod);
+                break;
             case 6: printf("\tIndique el codigo del producto: \n\t");
-					scanf("%i",&cod);
-					xx = buscarProducto(*p, cod);
-					mostrarSub(xx);
-					break;  //Esta funcion no va aca es para ver si inserto bien en la sublista
-							//deberia salir [NOMBRE] <-producto
-							//                  [numero de existencia]->...
+                scanf("%i",&cod);
+                xx = buscarProducto(*p, cod);
+                mostrarSub(xx);
+                break;  //Esta funcion no va aca es para ver si inserto bien en la sublista
+                //deberia salir [NOMBRE] <-producto
+                //                  [numero de existencia]->...
+                
             case 3: printf("\tIndique el codigo del producto: \n\t");
-					scanf("%i",&cod);
-					xx = buscarProducto(*p, cod); printf("\n");
-					if (xx)
-						printf("\tHay %i unidades de %s \n\n",existenciaP(xx),xx->desc);
-					break;
+                scanf("%i",&cod);
+                xx = buscarProducto(*p, cod);
+                if (xx)
+                    printf("\tHay %i unidades de %s \n",existenciaP(xx),xx->desc);
+                break;
             case 4: printf("\tIndique el codigo del producto: \n\t");
-					scanf("%i",&cod);
-					xx = buscarProducto(*p, cod);
-					system("cls");
-					menuModificar(xx,*p);
-					break;
+                scanf("%i",&cod);
+                xx = buscarProducto(*p, cod);
+                menuModificar(xx,*p);
+                break;
             case 5: printf("\tIndique el codigo del producto: \n\t");
-					scanf("%i",&cod);
-					elimProducto(&*p,cod);
-					elimfacturaproduct(t,cod); printf("\n");
-					break;
+                scanf("%i",&cod);
+                if (elimProducto(&*p,cod))
+                    printf("\tProducto Eliminado Correctamente!\n");
+                else
+                    printf("\tProducto no encontrado...\n");
+    
+                
+                break;
             case 7: mostrarproductos(*p);
-					break;
+                break;
         }
         system("pause");
         system("cls");
-        
     }
 }
 int guardarP(productos *p){
@@ -1232,7 +1178,7 @@ int CargarC(cliente **q){
                     fgets(buffer, 100, apun);
                     tt->precio = atoi(buffer);
                     fgets(buffer, 100, apun);
-                    tt->total = atol(buffer); /// estar pendite que carga-1-1-1
+                    tt->total = atol(buffer);
                     fgets(buffer,100,apun);
                     tt->codproduc = atoi(buffer);
                     fgets(buffer, 100, apun);
@@ -1277,7 +1223,6 @@ int CargarP(productos **q){
                 strcpy(t->desc, buffer);
                 fgets(buffer, 100, apun); //ramo
                 strcpy(t->ramo, buffer);
-                
                 //fgets(buffer, 100, apun);
                 //elimSaltos(buffer);
                 //strcpy(t->desc, buffer);
@@ -1327,6 +1272,9 @@ int CargarP(productos **q){
 }
 
 
+
+
+
 void menuArch(productos **p, cliente **q){
     system("cls");
     int op = -1;
@@ -1368,12 +1316,14 @@ int main(){
         printf("\t4.Consultas.\n ");
         printf("\t5.Guardar/Cargar datos de archivo.\n\n");
         printf("\t0. Salir.\n\n");
+        printf("\t\t");
         
         
-        printf("\t"); scanf("%i",&op);
+        
+        printf("\t\n"); scanf("%i",&op);
         
         switch(op){
-            case 1: menuProductos(&p,t);
+            case 1: menuProductos(&p);
                 break;
             case 2: menuClientes(&t);
                 break;
@@ -1391,4 +1341,3 @@ int main(){
     }
     return 1;
 }
-
