@@ -399,8 +399,9 @@ cliente *buscarCliente(cliente *t, long int ci){ //--
 }
 
 int calculo_precio(int cant, int precio){
-    return cant*precio;
-    
+	int y;
+	y=((precio*30)/100)+precio;
+    return cant*y;
 }
 
 void insertarDetalle(cliente *t, productos *p,int cant,int dia, int mes, int anno,int numfac, char desc[20]){ // t parado en cliente y p en el prducto que quiere comprar
@@ -499,19 +500,12 @@ int buscarnumfactura(cliente *t){
     return x;
 }
 
-int ganancia(int pre){
-    int x=0;
-    x=(pre*30)/100;
-    return x;
-}
-
-int calcular_total(cliente *t,int numfac, int cant){
+int calcular_total(cliente *t,int numfac){
     int total=0, x;
     factura *p =t->aba;
-    x=ganancia(p->precio);
     while(p){
         if (p->numfactura==numfac)
-            total= (x*cant)+total;
+			total+=p->precio;
         p= p->aba;
     }
     return total;
