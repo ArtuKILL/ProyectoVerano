@@ -23,7 +23,7 @@ struct lote{
 struct productos{
     int codigo;
     char desc[20];
-    char ramo[11];
+    char ramo[30];
     productos *sig;
     lote *aba;
 };
@@ -81,7 +81,7 @@ int codRep(productos *p,int x){ //Arroja 1 si hay un codigo rep, 0 si no hay.
 }
 
 void agregarProductos(productos **p){
-    int cod,f=0; char desc[21],ramo[11];    //tp1
+    int cod,f=0; char desc[21],ramo[30];    //tp1
     printf("\n\tCodigo del Producto\n ");
     do{
         if(f) printf("\tCodigo en uso...\n");
@@ -317,8 +317,8 @@ void insertarL(productos*p,int cod){ //Inserta lote por cola.
                         tt= tt->aba;
                     if (tt){
                         tt->aba = crearL(dia,mes,anno,cant,precio,codlote,exist);
-                        tt->aba->numlot = contarl(p->aba);
-                    }
+                        tt->aba->numlot = contarl(tt->aba);
+					}
                     else{
                         t->aba = crearL(dia,mes,anno,cant,precio,codlote,exist);
                         t->aba->numlot = 1;
@@ -1109,7 +1109,7 @@ void menuProductos(productos **p,cliente *t){
 int guardarP(productos *p){
     FILE *apun;
     
-    apun = fopen("/Users/sclean/Desktop/pruebaP.txt", "w");
+    apun = fopen("cargar\cargarP.txt", "w");
     lote *t;
     if (apun){
         while(p){
@@ -1137,14 +1137,13 @@ int guardarP(productos *p){
         fclose(apun);
         return 1;
     }
-    fclose(apun);
     return 0;
 }
 
 int guardarC(cliente *p){
     FILE *apun;
     
-    apun = fopen("/Users/sclean/Desktop/pruebaC.txt", "w"); //Cambiar ruta...
+    apun = fopen("cargar\cargarC.txt", "w"); //Cambiar ruta...
     factura *t;
     if (apun){
         while(p){
@@ -1172,7 +1171,6 @@ int guardarC(cliente *p){
         fclose(apun);
         return 1;
     }
-    fclose(apun);
     return 0;
 }
 
@@ -1201,7 +1199,7 @@ int CargarC(cliente **q){
     FILE *apun;
     char buffer[100];
     int ctrl = 0;
-    apun = fopen("/Users/sclean/Desktop/pruebaC.txt", "r");//    char ruta[]; scanf("%s",&ruta);       fopen(ruta, "r");
+    apun = fopen("cargar\cargarC.txt", "r");//    char ruta[]; scanf("%s",&ruta);       fopen(ruta, "r");
     if (apun){
         borrarclientes(&*q);
         fscanf(apun, "\n");
@@ -1241,7 +1239,7 @@ int CargarC(cliente **q){
                     fgets(buffer, 100, apun);
                     tt->precio = atoi(buffer);
                     fgets(buffer, 100, apun);
-                    tt->total = atol(buffer); /// estar pendite que carga-1-1-1
+                    tt->total = atol(buffer); 
                     fgets(buffer,100,apun);
                     tt->codproduc = atoi(buffer);
                     fgets(buffer, 100, apun);
@@ -1258,6 +1256,7 @@ int CargarC(cliente **q){
             fscanf(apun,"\n");
         }
         fscanf(apun,"\n");
+		fclose(apun);
     }
     return 0;
 }
@@ -1268,7 +1267,7 @@ int CargarP(productos **q){
     int val;
     char buffer[100];
     int ctrl = 0;
-    apun = fopen("/Users/sclean/Desktop/pruebaP.txt", "r");
+    apun = fopen("cargar\cargarP.txt", "r");
     if (apun){
         borrarproductos(&*q);
         fscanf(apun, "\n");
@@ -1331,6 +1330,7 @@ int CargarP(productos **q){
             fscanf(apun,"\n");
         }
         fscanf(apun,"\n");
+		fclose(apun);
     }
     return 0;
 }
@@ -1340,7 +1340,7 @@ void menuArch(productos **p, cliente **q){
     system("cls");
     int op = -1;
     
-    printf("\t\tMENU ARCHIVOS. \t\t\t ");tiempo();
+    printf("\t\tMENU ARCHIVOS. ");tiempo();
     printf("\t1.Guardar.\n ");
     printf("\t2.Cargar.\n\n ");
     printf("\t0.Salir al menu principal.\n");
@@ -1366,6 +1366,7 @@ void cargar(productos **p, cliente**q){
 }
 
 int main(){
+
     int op=-1; productos *p = NULL;
     cliente *t= NULL;
     cargar(&p,&t);
@@ -1381,7 +1382,7 @@ int main(){
         
         printf("\t"); scanf("%i",&op);
         
-        switch(op){
+		switch(op){
             case 1: menuProductos(&p,t);
                 break;
             case 2: menuClientes(&t);
